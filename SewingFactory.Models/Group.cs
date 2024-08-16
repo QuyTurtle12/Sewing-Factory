@@ -8,7 +8,8 @@ namespace SewingFactory.Models
         [Key]
         public Guid ID; //primary key
         public string? name;
-        public ICollection<User> users { get; set; } // Navigation property, one group has many user
+        public virtual ICollection<User> users { get; set; } // Navigation property, one group has many users
+        public virtual ICollection<Task> tasks { get; set; } // Navigation property, one group has many tasks
 
         public Group() { }
 

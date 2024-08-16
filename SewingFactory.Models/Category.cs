@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SewingFactory.Models
 {
@@ -8,7 +7,7 @@ namespace SewingFactory.Models
         [Key]
         public Guid ID; //primary key
         public string? name;
-
+        public virtual ICollection<Product> products {  get; set; } // Navigation property, one category can be in many products
         public Category(){ }
 
         public Category(Guid id, string? name)

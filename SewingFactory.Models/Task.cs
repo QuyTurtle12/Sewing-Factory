@@ -16,6 +16,9 @@ namespace SewingFactory.Models
         public DateTime? createdDate;
         public DateTime? deadline;
         public Guid groupID;
+        public virtual Order order { get; set; } // Navigation property, one task is based on one order
+        public virtual User user { get; set; } // Navigation property, one task is created by one user
+        public virtual Group group { get; set; } // Navigation property, one task is assigned for one group
 
         public Task() { }
 

@@ -13,10 +13,10 @@ namespace SewingFactory.Models
         public string username;
         public string password;
         public double? salary;
-        public Role role { get; set; } // Navigation property, one user has one role
-        public Group group { get; set; } // Navigation property, one user is associated with one group
-        public ICollection<Task> tasks { get; set; } // Navigation property, one user can creates many tasks
-        public Order order { get; set; } // Navigation property, one user is associated with one order
+        public virtual Role role { get; set; } // Navigation property, one user has one role
+        public virtual Group group { get; set; } // Navigation property, one user is associated with one group
+        public virtual ICollection<Task> tasks { get; set; } // Navigation property, one user can creates many tasks
+        public virtual ICollection<Order> orders { get; set; } // Navigation property, one user can create many orders
 
 
         public User() { }

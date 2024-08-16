@@ -12,18 +12,20 @@ namespace SewingFactory.Models
         public DateTime? finishedDate;
         public int userID;
         public string? status;
-        public double? totalPrice;
-
+        public double? totalAmount;
+        public virtual ICollection<Task> tasks {  get; set; } // Navigation property, one order has many tasks
+        public virtual ICollection<OrderDetail> detail { get; set; } // Navigation property, one order has many detail
+        public User user { get; set; } // Navigation property, one order is created by one user
         public Order() { }
 
-        public Order(Guid id, DateTime? orderDate, DateTime? finishedDate, int userID, string? status, double? totalPrice)
+        public Order(Guid id, DateTime? orderDate, DateTime? finishedDate, int userID, string? status, double? totalAmount)
         {
             ID = id;
             this.orderDate = orderDate;
             this.finishedDate = finishedDate;
             this.userID = userID;
             this.status = status;
-            this.totalPrice = totalPrice;
+            this.totalAmount = totalAmount;
         }
 
         public DateTime? OrderDate
@@ -51,8 +53,8 @@ namespace SewingFactory.Models
         
         public double? TotalPrice
         {
-            get { return totalPrice; }
-            set { totalPrice = value; }
+            get { return totalAmount; }
+            set { totalAmount = value; }
         }
 
     }

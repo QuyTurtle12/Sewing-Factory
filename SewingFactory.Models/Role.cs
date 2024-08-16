@@ -9,7 +9,7 @@ namespace SewingFactory.Models
         [Key]
         public Guid ID;
         public string? name;
-        public ICollection<User> users { get; set; } // Navigation property, one role has many user
+        public virtual ICollection<User> users { get; set; } // Navigation property, one role has many user
 
         public Role() { }
 

@@ -13,7 +13,8 @@ namespace SewingFactory.Models
         public Guid productID;
         public int? quantity;
         public double? totalPrice;
-
+        public virtual Order order {  get; set; } // Navigation property, one order detail is included in one order
+        public virtual Product product { get; set; } // Navigation property, one order detail has one product 
         public OrderDetail() { }
 
         public OrderDetail(Guid orderID, Guid productID, int? quantity, double? totalPrice)
