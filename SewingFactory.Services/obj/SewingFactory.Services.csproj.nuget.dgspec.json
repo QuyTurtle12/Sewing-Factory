@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\Services\\SewingFactory.Services.csproj": {}
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {}
   },
   "projects": {
-    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\Services\\SewingFactory.Services.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\Services\\SewingFactory.Services.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
         "projectName": "SewingFactory.Services",
-        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\Services\\SewingFactory.Services.csproj",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
         "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\Services\\obj\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -40,15 +40,21 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
-            "Microsoft.AspNetCore": {
-              "target": "Package",
-              "version": "[2.2.0, )"
-            },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
               "version": "[8.0.8, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
+              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
+              "suppressParent": "All",
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",

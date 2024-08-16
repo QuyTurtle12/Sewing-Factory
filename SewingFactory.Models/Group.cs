@@ -6,8 +6,8 @@ namespace SewingFactory.Models
     public class Group
     {
         [Key]
-        public Guid ID; //primary key
-        public string? name;
+        public Guid ID { get; set; } //primary key
+        public string? name { get; set; }
         public virtual ICollection<User> users { get; set; } // Navigation property, one group has many users
         public virtual ICollection<Task> tasks { get; set; } // Navigation property, one group has many tasks
 
@@ -19,10 +19,5 @@ namespace SewingFactory.Models
             this.name = name;
         }
 
-        public string? Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
     }
 }

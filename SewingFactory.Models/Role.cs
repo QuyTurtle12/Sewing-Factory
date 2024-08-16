@@ -7,8 +7,8 @@ namespace SewingFactory.Models
     public class Role
     {
         [Key]
-        public Guid ID;
-        public string? name;
+        public Guid ID { get; set; }
+        public string? name { get; set; }
         public virtual ICollection<User> users { get; set; } // Navigation property, one role has many user
 
         public Role() { }
@@ -19,10 +19,5 @@ namespace SewingFactory.Models
             this.name = name;
         }
 
-        public string? Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
     }
 }

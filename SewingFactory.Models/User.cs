@@ -6,13 +6,13 @@ namespace SewingFactory.Models
     public class User
     {
         [Key]
-        public Guid ID; //primary key
-        public string? name;
-        public Guid roleID;
-        public int? groupID;
-        public string username;
-        public string password;
-        public double? salary;
+        public Guid ID { get; set; } //primary key
+        public string? name { get; set; }
+        public Guid roleID { get; set; }
+        public Guid groupID { get; set; }
+        public string username { get; set; }
+        public string password { get; set; }
+        public double? salary { get; set; }
         public virtual Role role { get; set; } // Navigation property, one user has one role
         public virtual Group group { get; set; } // Navigation property, one user is associated with one group
         public virtual ICollection<Task> tasks { get; set; } // Navigation property, one user can creates many tasks
@@ -20,7 +20,7 @@ namespace SewingFactory.Models
 
 
         public User() { }
-        public User(Guid id, string name, Guid roleID, int groupID, string username, string password, double? salary)
+        public User(Guid id, string name, Guid roleID, Guid groupID, string username, string password, double? salary)
         {
             ID = id;
             this.name = name;
@@ -31,34 +31,6 @@ namespace SewingFactory.Models
             this.salary = salary;
         }
 
-        public string? Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
-        public int? GroupID
-        {
-            get { return groupID; }
-            set { groupID = value; }
-        }
-
-        public string UserName
-        {
-            get { return username; }
-            set { username = value; }
-        }
-
-        public string Password
-        {
-            get { return password; }
-            set { password = value; }
-        }
-        public double? Salary
-        {
-            get { return salary; }
-            set { salary = value; }
-        }
     }
 
 }

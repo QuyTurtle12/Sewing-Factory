@@ -8,6 +8,7 @@
 *.userosscache
 *.suo
 *.sln.docstates
+appsettings.json
 
 # Ignore build results
 [Dd]ebug/

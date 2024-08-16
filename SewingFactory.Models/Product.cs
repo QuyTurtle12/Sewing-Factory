@@ -7,11 +7,11 @@ namespace SewingFactory.Models
     public class Product
     {
         [Key]
-        public Guid ID; //primary key
-        public string? name;
-        public Guid categoryID;
-        public double? price;
-        public virtual ICollection<OrderDetail> detail { get; set; } // Navigation property, one product can be in many order detail
+        public Guid ID { get; set; } //primary key
+        public string? name { get; set; }
+        public Guid categoryID { get; set; }
+        public double? price { get; set; }
+        public virtual ICollection<Order> orders { get; set; } // Navigation property, one product can be in many orders
         public virtual Category category { get; set; } // Navigation property, one product can have one category
        
         public Product() { }
@@ -22,19 +22,6 @@ namespace SewingFactory.Models
             this.name = name;
             this.categoryID = categoryID;
             this.price = price;
-        }
-
-
-        public string? Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-
-        public double? Price
-        {
-            get { return price; }
-            set { price = value; }
         }
     }
 }

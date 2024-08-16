@@ -7,22 +7,22 @@ namespace SewingFactory.Models
     public class Task
     {
         [Key]
-        public Guid ID;
-        public string orderID;
-        public string? name;
-        public string? description;
-        public double? status;
-        public Guid creatorID;
-        public DateTime? createdDate;
-        public DateTime? deadline;
-        public Guid groupID;
+        public Guid ID { get; set; }
+        public Guid orderID { get; set; }
+        public string? name { get; set; }
+        public string? description { get; set; }
+        public double? status { get; set; }
+        public Guid creatorID { get; set; }
+        public DateTime? createdDate { get; set; }
+        public DateTime? deadline { get; set; }
+        public Guid groupID { get; set; }
         public virtual Order order { get; set; } // Navigation property, one task is based on one order
         public virtual User user { get; set; } // Navigation property, one task is created by one user
         public virtual Group group { get; set; } // Navigation property, one task is assigned for one group
 
         public Task() { }
 
-        public Task(Guid id, string orderID, string? name, string? description, DateTime? createdDate, DateTime? deadline, Guid creatorID, Guid groupID, double? status)
+        public Task(Guid id, Guid orderID, string? name, string? description, DateTime? createdDate, DateTime? deadline, Guid creatorID, Guid groupID, double? status)
         {
             ID = id;
             this.orderID = orderID;
@@ -35,16 +35,5 @@ namespace SewingFactory.Models
             this.status = status;
         }
 
-        public string OrderID { get {  return orderID; } set { orderID = value; } }
-
-        public string? Name { get { return name; } set { name = value; } }
-
-        public string? Description { get { return description; } set { description = value; } }
-
-        public DateTime? CreatedDate { get {  return createdDate; } set {  createdDate = value; } }
-
-        public DateTime? Deadline { get { return deadline; } set {  deadline = value; } }
-
-        public double? Status { get { return status; } set { status = value; } }
     }
 }
