@@ -1,35 +1,36 @@
-﻿
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SewingFactory.Models
 {
     public class Order
     {
         [Key]
-        public Guid ID { get; set; } //primary key
-        public DateTime? orderDate { get; set; }
-        public DateTime? finishedDate { get; set; }
-        public Guid productID { get; set; }
-        public int? quantity { get; set; }
-        public double? totalAmount { get; set; }
-        public Guid userID { get; set; }
-        public string? status { get; set; }
-        public virtual ICollection<Task> tasks { get; set; } // Navigation property, one order has many tasks
-        public virtual Product product { get; set; } // Navigation property, one order has one product
-        public User user { get; set; } // Navigation property, one order is created by one user
+        public Guid ID { get; set; } // Primary key
+
+        public DateTime? OrderDate { get; set; }
+        public DateTime? FinishedDate { get; set; }
+        public Guid ProductID { get; set; }
+        public int? Quantity { get; set; }
+        public double? TotalAmount { get; set; }
+        public Guid UserID { get; set; }
+        public string? Status { get; set; }
+
+        public virtual ICollection<Task> Tasks { get; set; } // Navigation property, one order has many tasks
+        public virtual Product Product { get; set; } // Navigation property, one order has one product
+        public User User { get; set; } // Navigation property, one order is created by one user
 
         public Order() { }
 
-        public Order(Guid id, DateTime? orderDate, DateTime? finishedDate, Guid userID, string? status, double? totalAmount)
+        public Order(Guid id, DateTime? orderDate, DateTime? finishedDate, Guid userID, string? status, double? totalAmount, Guid productID, int quantity)
         {
             ID = id;
-            this.orderDate = orderDate;
-            this.finishedDate = finishedDate;
-            this.userID = userID;
-            this.status = status;
-            this.totalAmount = totalAmount;
+            OrderDate = orderDate;
+            FinishedDate = finishedDate;
+            UserID = userID;
+            Status = status;
+            TotalAmount = totalAmount;
+            ProductID = productID;
+            Quantity = quantity;
         }
-
     }
 }

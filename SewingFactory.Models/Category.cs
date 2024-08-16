@@ -7,14 +7,14 @@ namespace SewingFactory.Models
         [Key]
         public Guid ID { get; set; } //primary key
 
-        public string? name { get; set; }
-        public virtual ICollection<Product> products {  get; set; } // Navigation property, one category can be in many products
+        public string? Name { get; set; }
+        public virtual ICollection<Product> Products {  get; set; } // Navigation property, one category can be in many products
         public Category(){ }
 
-        public Category(Guid id, string? name)
+        public Category(Guid id, string? Name)
         {
             ID = id;
-            this.name = name;
+            this.Name = Name;
         }
     }
 }

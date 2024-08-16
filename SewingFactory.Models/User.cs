@@ -6,31 +6,31 @@ namespace SewingFactory.Models
     public class User
     {
         [Key]
-        public Guid ID { get; set; } //primary key
-        public string? name { get; set; }
-        public Guid roleID { get; set; }
-        public Guid groupID { get; set; }
-        public string username { get; set; }
-        public string password { get; set; }
-        public double? salary { get; set; }
-        public virtual Role role { get; set; } // Navigation property, one user has one role
-        public virtual Group group { get; set; } // Navigation property, one user is associated with one group
-        public virtual ICollection<Task> tasks { get; set; } // Navigation property, one user can creates many tasks
-        public virtual ICollection<Order> orders { get; set; } // Navigation property, one user can create many orders
+        public Guid ID { get; set; } // Primary key
 
+        public string? Name { get; set; }
+        public Guid RoleID { get; set; }
+        public Guid GroupID { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public double? Salary { get; set; }
+
+        public virtual Role Role { get; set; } // Navigation property, one user has one role
+        public virtual Group Group { get; set; } // Navigation property, one user is associated with one group
+        public virtual ICollection<Task> Tasks { get; set; } // Navigation property, one user can create many tasks
+        public virtual ICollection<Order> Orders { get; set; } // Navigation property, one user can create many orders
 
         public User() { }
+
         public User(Guid id, string name, Guid roleID, Guid groupID, string username, string password, double? salary)
         {
             ID = id;
-            this.name = name;
-            this.roleID = roleID;
-            this.groupID = groupID;
-            this.username = username;
-            this.password = password;
-            this.salary = salary;
+            Name = name;
+            RoleID = roleID;
+            GroupID = groupID;
+            Username = username;
+            Password = password;
+            Salary = salary;
         }
-
     }
-
 }

@@ -15,75 +15,77 @@ namespace SewingFactory.Repositories.DBContext
         public DbSet<Product> Products { get; set; }
         public DbSet<Models.Task> Tasks { get; set; }
 
-        //Mapping Configuration
+        // Mapping Configuration
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
             // User - Task Relationship
             modelBuilder.Entity<User>()
-                .HasMany(u => u.tasks)
-                .WithOne(t => t.user)
-                .HasForeignKey(t => t.creatorID)
-                .IsRequired();
+                .HasMany(u => u.Tasks)
+                .WithOne(t => t.User)
+                .HasForeignKey(t => t.CreatorID)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
 
             // User - Role Relationship
             modelBuilder.Entity<User>()
-                .HasOne(u => u.role)
-                .WithMany(r => r.users)
-                .HasForeignKey(u => u.roleID)
-                .IsRequired();
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleID)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
 
             // User - Orders Relationship
             modelBuilder.Entity<User>()
-                .HasMany(u => u.orders)
-                .WithOne(o => o.user)
-                .HasForeignKey(o => o.userID)
+                .HasMany(u => u.Orders)
+                .WithOne(o => o.User)
+                .HasForeignKey(o => o.UserID)
                 .IsRequired();
 
             // User - Group Relationship
             modelBuilder.Entity<User>()
-                .HasOne(u => u.group)
-                .WithMany(g => g.users)
-                .HasForeignKey(u => u.groupID)
-                .IsRequired();
+                .HasOne(u => u.Group)
+                .WithMany(g => g.Users)
+                .HasForeignKey(u => u.GroupID)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
 
             // Group - Task Relationship
             modelBuilder.Entity<Group>()
-                .HasMany(g => g.tasks)
-                .WithOne(t => t.group)
-                .HasForeignKey(t => t.groupID)
+                .HasMany(g => g.Tasks)
+                .WithOne(t => t.Group)
+                .HasForeignKey(t => t.GroupID)
                 .IsRequired();
 
             // Task - Order Relationship
             modelBuilder.Entity<Models.Task>()
-                .HasOne(t => t.order)
-                .WithMany(o => o.tasks)
-                .HasForeignKey(t => t.orderID)
+                .HasOne(t => t.Order)
+                .WithMany(o => o.Tasks)
+                .HasForeignKey(t => t.OrderID)
                 .IsRequired();
 
             // Order - Product Relationship
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.product)
-                .WithMany(p => p.orders)
-                .HasForeignKey(o => o.productID)
+                .HasOne(o => o.Product)
+                .WithMany(p => p.Orders)
+                .HasForeignKey(o => o.ProductID)
                 .IsRequired();
-
 
             // Category - Product Relationship
             modelBuilder.Entity<Category>()
-                .HasMany(c => c.products)
-                .WithOne(p => p.category)
-                .HasForeignKey(p => p.categoryID)
+                .HasMany(c => c.Products)
+                .WithOne(p => p.Category)
+                .HasForeignKey(p => p.CategoryID)
                 .IsRequired();
 
             // Seed roles
             modelBuilder.Entity<Role>().HasData(
-                new Role { ID = Guid.NewGuid(), name = "Cashier" },
-                new Role { ID = Guid.NewGuid(), name = "Order Manager" },
-                new Role { ID = Guid.NewGuid(), name = "Product Manager" },
-                new Role { ID = Guid.NewGuid(), name = "Staff Manager" },
-                new Role { ID = Guid.NewGuid(), name = "Sewing Staff" }
+                new Role { ID = Guid.NewGuid(), Name = "Cashier" },
+                new Role { ID = Guid.NewGuid(), Name = "Order Manager" },
+                new Role { ID = Guid.NewGuid(), Name = "Product Manager" },
+                new Role { ID = Guid.NewGuid(), Name = "Staff Manager" },
+                new Role { ID = Guid.NewGuid(), Name = "Sewing Staff" }
             );
         }
     }
