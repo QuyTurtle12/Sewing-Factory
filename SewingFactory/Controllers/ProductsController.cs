@@ -45,7 +45,7 @@ namespace SewingFactory.Controllers
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, ProductDTO product)
+        public async Task<IActionResult> PutProduct(Guid id, Product product)
         {
             // Check if the product exists
             var existingProduct = await _context.Products.FindAsync(id);
@@ -58,6 +58,10 @@ namespace SewingFactory.Controllers
             if (!categoryExists)
             {
                 return NotFound(new { message = "Category not found." });
+            }
+            if (product.Price <= 0)
+            {
+                return BadRequest(new { message = "Price must be greater than 0." });
             }
 
             // Map the ProductDTO to the existing Product entity
@@ -89,26 +93,25 @@ namespace SewingFactory.Controllers
         // POST: api/Products
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
+        public async Task<ActionResult<Product>> PostProduct(Product product)
         {
             // Check if the CategoryID exists in the Categories table
-            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == product.CategoryID);
             if (!categoryExists)
             {
                 return NotFound(new { message = "Category not found." });
             }
-
-            var product = new Product
+            if(product.Price <= 0)
             {
-                Name = productDTO.Name,
-                CategoryID = productDTO.CategoryID,
-                Price = productDTO.Price
-            };
+                return BadRequest(new { message = "Price must be greater than 0." });
+            }
 
-            _context.Products.Add(product);
+            Product newProduct = new Product(product.Name, product.CategoryID, product.Price);
+
+            _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetProduct", new { id = product.ID }, product);
+            return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
         }
 
         // DELETE: api/Products/5

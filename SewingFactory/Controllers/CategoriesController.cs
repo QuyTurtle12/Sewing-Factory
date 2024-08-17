@@ -78,10 +78,11 @@ namespace SewingFactory.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            _context.Categories.Add(category);
+            Category newCategory = new Category(category.Name);
+            _context.Categories.Add(newCategory);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCategory", new { id = category.ID }, category);
+            return CreatedAtAction("GetCategory", new { id = newCategory.ID }, newCategory);
         }
 
         // DELETE: api/Categories/5

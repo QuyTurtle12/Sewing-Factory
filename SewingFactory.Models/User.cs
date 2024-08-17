@@ -15,11 +15,6 @@ namespace SewingFactory.Models
         public string Password { get; set; }
         public double? Salary { get; set; }
 
-        public virtual Role Role { get; set; } // Navigation property, one user has one role
-        public virtual Group Group { get; set; } // Navigation property, one user is associated with one group
-        public virtual ICollection<Task> Tasks { get; set; } // Navigation property, one user can create many tasks
-        public virtual ICollection<Order> Orders { get; set; } // Navigation property, one user can create many orders
-
         public User() { }
 
         public User(Guid id, string name, Guid roleID, Guid groupID, string username, string password, double? salary)

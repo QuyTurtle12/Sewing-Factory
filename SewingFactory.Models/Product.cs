@@ -10,8 +10,6 @@ namespace SewingFactory.Models
         public Guid CategoryID { get; set; }
         public double? Price { get; set; }
 
-        public virtual ICollection<Order> Orders { get; set; } // Navigation property, one product can be in many orders
-
         public Product() { }
 
         public Product(string? name, Guid categoryID, double? price)
