@@ -16,7 +16,7 @@ namespace SewingFactory.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateUser(CreateUserDto request)
+        public IActionResult CreateUser(CreateDto request)
         {
             if (request == null)
             {
@@ -32,6 +32,7 @@ namespace SewingFactory.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
         [HttpPost("login")]
         public IActionResult Login(LoginDto loginDto)
         {
@@ -43,6 +44,62 @@ namespace SewingFactory.Controllers
             catch (UnauthorizedAccessException ex)
             {
                 return Unauthorized(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult GetAllUsers()
+        {
+            try
+            {
+                return Ok(_userService.GetAllUsers());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        [HttpGet]
+        [Route("{id:guid}")]
+        public IActionResult GetUserById(Guid id)
+        {
+            try
+            {
+                return Ok(_userService.GetUserById(id));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        [HttpPut]
+        [Route("{id:guid}")]
+        public IActionResult UpdateUser(Guid id, UpdateDto request)
+        {
+            try
+            {
+                return Ok(_userService.UpdateUser(id, request));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        [HttpDelete]
+        [Route("{id:guid}")]
+        public IActionResult DeleteUser(Guid id)
+        {
+            try
+            {
+                _userService.DeleteUser(id);
+                return Ok("Deleted!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
             }
         }
     }

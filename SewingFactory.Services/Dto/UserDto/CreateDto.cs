@@ -2,7 +2,7 @@
 
 namespace SewingFactory.Services.Dto.UserDto
 {
-    public class CreateUserDto
+    public class CreateDto
     {
         public required string Name { get; set; }
 

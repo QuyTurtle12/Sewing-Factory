@@ -21,6 +21,7 @@ namespace SewingFactory
 
             // Register the UserService
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddSingleton<ITokenService, TokenService>();
 
             var app = builder.Build();
 
