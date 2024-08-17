@@ -13,9 +13,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{B9D3B4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SewingFactory.Models", "..\SewingFactory.Models\SewingFactory.Models.csproj", "{516D497B-E4E1-4AA7-974C-3660E3034442}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewingFactory.Repository", "..\SewingFactory.Repository\SewingFactory.Repository.csproj", "{AE9F38A1-4A86-4631-816C-39104BE50372}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SewingFactory.Repository", "..\SewingFactory.Repository\SewingFactory.Repository.csproj", "{AE9F38A1-4A86-4631-816C-39104BE50372}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewingFactory.Services", "..\SewingFactory.Services\SewingFactory.Services.csproj", "{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SewingFactory.Services", "..\SewingFactory.Services\SewingFactory.Services.csproj", "{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
