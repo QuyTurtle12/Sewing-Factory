@@ -28,9 +28,10 @@ namespace SewingFactory
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // Register the UserService
+            // Register the Services
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<TaskService>();
             builder.Services.AddSingleton<ITokenService, TokenService>();
 
             var app = builder.Build();
