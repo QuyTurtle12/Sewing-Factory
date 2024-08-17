@@ -6,14 +6,13 @@ namespace SewingFactory.Models
     {
         [Key]
         public Guid ID { get; set; } //primary key
-
         public string? Name { get; set; }
         public virtual ICollection<Product> Products {  get; set; } // Navigation property, one category can be in many products
         public Category(){ }
 
-        public Category(Guid id, string? Name)
+        public Category(string? Name)
         {
-            ID = id;
+            ID = Guid.NewGuid();
             this.Name = Name;
         }
     }
