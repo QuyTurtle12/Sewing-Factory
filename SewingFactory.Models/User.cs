@@ -14,6 +14,7 @@ namespace SewingFactory.Models
         public string Username { get; set; }
         public string Password { get; set; }
         public double? Salary { get; set; }
+        public bool? Status { get; set; }
 
         public virtual Role Role { get; set; } // Navigation property, one user has one role
         public virtual Group Group { get; set; } // Navigation property, one user is associated with one group

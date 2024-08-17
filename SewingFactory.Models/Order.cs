@@ -14,6 +14,8 @@ namespace SewingFactory.Models
         public double? TotalAmount { get; set; }
         public Guid UserID { get; set; }
         public string? Status { get; set; }
+        public string? CustomerName { get; set; }
+        public string? CustomerPhone { get; set; }
 
         public virtual ICollection<Task> Tasks { get; set; } // Navigation property, one order has many tasks
         public virtual Product Product { get; set; } // Navigation property, one order has one product
