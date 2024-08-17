@@ -45,19 +45,12 @@ namespace SewingFactory.Controllers
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(Guid id, [FromBody] string name)
+        public async Task<IActionResult> PutCategory(Guid id, Category category)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
             if (id != category.ID)
             {
                 return BadRequest();
             }
-
-            category.Name = name; //update the name
 
             _context.Entry(category).State = EntityState.Modified;
 
@@ -83,13 +76,8 @@ namespace SewingFactory.Controllers
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory([FromBody] string name)
+        public async Task<ActionResult<Category>> PostCategory(Category category)
         {
-            var category = new Category
-            {
-                Name = name
-            };
-
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 

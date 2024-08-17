@@ -11,7 +11,6 @@ namespace SewingFactory.Models
         public double? Price { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; } // Navigation property, one product can be in many orders
-        public virtual Category Category { get; set; } // Navigation property, one product can have one category
 
         public Product() { }
 

@@ -22,62 +22,62 @@ namespace SewingFactory.Repositories.DBContext
 
             // User - Task Relationship
             modelBuilder.Entity<User>()
-                .HasMany(u => u.Tasks)
-                .WithOne(t => t.User)
+                .HasMany<Models.Task>()
+                .WithOne()
                 .HasForeignKey(t => t.CreatorID)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);
 
             // User - Role Relationship
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany(r => r.Users)
+                .HasOne<Role>()
+                .WithMany()
                 .HasForeignKey(u => u.RoleID)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);
 
             // User - Orders Relationship
             modelBuilder.Entity<User>()
-                .HasMany(u => u.Orders)
-                .WithOne(o => o.User)
+                .HasMany<Order>()
+                .WithOne()
                 .HasForeignKey(o => o.UserID)
                 .IsRequired();
 
             // User - Group Relationship
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Group)
-                .WithMany(g => g.Users)
+                .HasOne<Group>()
+                .WithMany()
                 .HasForeignKey(u => u.GroupID)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.NoAction);
 
             // Group - Task Relationship
             modelBuilder.Entity<Group>()
-                .HasMany(g => g.Tasks)
-                .WithOne(t => t.Group)
+                .HasMany<Models.Task>()
+                .WithOne()
                 .HasForeignKey(t => t.GroupID)
                 .IsRequired();
 
             // Task - Order Relationship
             modelBuilder.Entity<Models.Task>()
-                .HasOne(t => t.Order)
-                .WithMany(o => o.Tasks)
+                .HasOne<Order>()
+                .WithMany()
                 .HasForeignKey(t => t.OrderID)
                 .IsRequired();
 
             // Order - Product Relationship
             modelBuilder.Entity<Order>()
-                .HasOne(o => o.Product)
-                .WithMany(p => p.Orders)
+                .HasOne<Product>()
+                .WithMany()
                 .HasForeignKey(o => o.ProductID)
                 .IsRequired();
 
             // Category - Product Relationship
-            modelBuilder.Entity<Category>()
-                .HasMany(c => c.Products)
-                .WithOne(p => p.Category)
+            modelBuilder.Entity<Product>()
+                .HasOne<Category>()
+                .WithMany()
                 .HasForeignKey(p => p.CategoryID)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.Cascade);
 
             // Seed roles
             modelBuilder.Entity<Role>().HasData(
