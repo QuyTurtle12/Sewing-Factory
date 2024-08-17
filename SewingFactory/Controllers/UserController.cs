@@ -33,20 +33,6 @@ namespace SewingFactory.Controllers
             }
         }
 
-        [HttpPost("login")]
-        public IActionResult Login(LoginDto loginDto)
-        {
-            try
-            {
-                var token = _userService.Login(loginDto);
-                return Ok(new { Token = token });
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                return Unauthorized(ex.Message);
-            }
-        }
-
         [HttpGet]
         public IActionResult GetAllUsers()
         {
