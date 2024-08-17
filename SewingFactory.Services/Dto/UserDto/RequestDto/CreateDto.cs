@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SewingFactory.Services.Dto.UserDto
+namespace SewingFactory.Services.Dto.UserDto.RequestDto
 {
     public class CreateDto
     {

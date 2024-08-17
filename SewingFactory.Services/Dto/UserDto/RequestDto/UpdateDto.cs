@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SewingFactory.Services.Dto.UserDto
+namespace SewingFactory.Services.Dto.UserDto.RequestDto
 {
     public class UpdateDto
     {
-        
+
         public string? Name { get; set; }
 
         public Guid? RoleID { get; set; }

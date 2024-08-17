@@ -1,7 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto.UserDto;
+using SewingFactory.Services.Dto.UserDto.RequestDto;
+using SewingFactory.Services.Dto.UserDto.RespondDto;
 using System.ComponentModel.DataAnnotations;
 
 namespace SewingFactory.Services.Service
@@ -10,29 +13,49 @@ namespace SewingFactory.Services.Service
     {
         private readonly DatabaseContext _dbContext;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
 
-        public UserService(DatabaseContext dbContext, IConfiguration configuration)
+        public UserService(DatabaseContext dbContext, IConfiguration configuration, IMapper mapper)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
-        public List<User> GetAllUsers() => _dbContext.Users.ToList();
-
-        public User GetUserById(Guid id)
+        public async Task<List<UserDto>> GetAllUsersAsync()
         {
-            var user = _dbContext.Users.Find(id) ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
-            return user;
+            var users = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .ToListAsync();
+
+            return _mapper.Map<List<UserDto>>(users);
         }
 
-        public User UpdateUser(Guid id, UpdateDto request)
+        public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
-            var user = _dbContext.Users.Find(id) ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+            var user = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.ID == id)
+                ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+
+            return _mapper.Map<UserDto>(user);
+        }
+
+        public async Task<UserDto> UpdateUserAsync(Guid id, UpdateDto request)
+        {
+            var user = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.ID == id)
+                ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
 
             // Validate the request DTO
             ValidateUpdateUserDto(id, request);
 
-            // Update user properties only if they are provided
+            // Map properties from request DTO to user entity
+            // Only update fields that are provided in the request
             if (!string.IsNullOrWhiteSpace(request.Name))
             {
                 user.Name = request.Name;
@@ -65,38 +88,33 @@ namespace SewingFactory.Services.Service
 
             // Save changes to the database
             _dbContext.Users.Update(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
 
-            return user;
+            return _mapper.Map<UserDto>(user);
         }
 
-        public User CreateUser(CreateDto createUser)
+        public async Task<UserDto> CreateUserAsync(CreateDto createUser)
         {
             if (createUser == null) throw new ArgumentNullException(nameof(createUser));
 
             // Validate the request DTO
             ValidateCreateUserDto(createUser);
 
-            var user = new User
-            {
-                Name = createUser.Name,
-                RoleID = createUser.RoleID,
-                GroupID = createUser.GroupID ?? Guid.Empty,
-                Username = createUser.Username,
-                Password = BCrypt.Net.BCrypt.HashPassword(createUser.Password),
-                Salary = createUser.Salary
-            };
+            var user = _mapper.Map<User>(createUser);
 
             _dbContext.Users.Add(user);
-            _dbContext.SaveChanges();
-            return user;
+            await _dbContext.SaveChangesAsync();
+
+            return _mapper.Map<UserDto>(user);
         }
 
-        public void DeleteUser(Guid id)
+        public async System.Threading.Tasks.Task DeleteUserAsync(Guid id)
         {
-            var user = _dbContext.Users.Find(id) ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+            var user = await _dbContext.Users.FindAsync(id)
+                ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+
             _dbContext.Users.Remove(user);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
 
         private void ValidateCreateUserDto(CreateDto request)

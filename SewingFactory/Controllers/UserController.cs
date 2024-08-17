@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Services.Dto.UserDto;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SewingFactory.Services.Dto.UserDto.RequestDto;
 using SewingFactory.Services.Service;
 
 namespace SewingFactory.Controllers
@@ -15,8 +16,9 @@ namespace SewingFactory.Controllers
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
         }
 
+        [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpPost]
-        public IActionResult CreateUser(CreateDto request)
+        public async Task<IActionResult> CreateUser([FromBody] CreateDto request)
         {
             if (request == null)
             {
@@ -24,7 +26,7 @@ namespace SewingFactory.Controllers
             }
             try
             {
-                var user = _userService.CreateUser(request);
+                var user = await _userService.CreateUserAsync(request);
                 return Ok("Create user successfully!!");
             }
             catch (Exception ex)
@@ -34,11 +36,12 @@ namespace SewingFactory.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetAllUsers()
+        public async Task<IActionResult> GetAllUsers()
         {
             try
             {
-                return Ok(_userService.GetAllUsers());
+                var users = await _userService.GetAllUsersAsync();
+                return Ok(users);
             }
             catch (Exception ex)
             {
@@ -48,11 +51,12 @@ namespace SewingFactory.Controllers
 
         [HttpGet]
         [Route("{id:guid}")]
-        public IActionResult GetUserById(Guid id)
+        public async Task<IActionResult> GetUserById(Guid id)
         {
             try
             {
-                return Ok(_userService.GetUserById(id));
+                var user = await _userService.GetUserByIdAsync(id);
+                return Ok(user);
             }
             catch (Exception ex)
             {
@@ -60,13 +64,15 @@ namespace SewingFactory.Controllers
             }
         }
 
+        [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpPut]
         [Route("{id:guid}")]
-        public IActionResult UpdateUser(Guid id, UpdateDto request)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateDto request)
         {
             try
             {
-                return Ok(_userService.UpdateUser(id, request));
+                var updatedUser = await _userService.UpdateUserAsync(id, request);
+                return Ok(updatedUser);
             }
             catch (Exception ex)
             {
@@ -74,13 +80,14 @@ namespace SewingFactory.Controllers
             }
         }
 
+        [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpDelete]
         [Route("{id:guid}")]
-        public IActionResult DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(Guid id)
         {
             try
             {
-                _userService.DeleteUser(id);
+                await _userService.DeleteUserAsync(id);
                 return Ok("Deleted!");
             }
             catch (Exception ex)

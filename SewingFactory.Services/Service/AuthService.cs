@@ -1,11 +1,13 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto.UserDto;
+using SewingFactory.Services.Dto.UserDto.RequestDto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
+using System.Threading.Tasks;
 
 namespace SewingFactory.Services.Service
 {
@@ -20,10 +22,12 @@ namespace SewingFactory.Services.Service
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         }
 
-        public string Login(LoginDto loginDto)
+        public async Task<string> LoginAsync(LoginDto loginDto)
         {
-            var user = _dbContext.Users
-                .FirstOrDefault(u => u.Username == loginDto.Username);
+            var user = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(g => g.Group)
+                .FirstOrDefaultAsync(u => u.Username == loginDto.Username);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
             {
@@ -37,6 +41,7 @@ namespace SewingFactory.Services.Service
     public interface ITokenService
     {
         string GenerateJwtToken(User user);
+        ClaimsPrincipal DecodeJwtToken(string token);
     }
 
     public class TokenService : ITokenService
@@ -54,21 +59,61 @@ namespace SewingFactory.Services.Service
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // Ensure Role and Group are not null
+            var roleName = user.Role?.Name ?? "DefaultRole";
+            var groupName = user.Group?.Name ?? "DefaultGroup";
+
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim("username", user.Username),
                 new Claim("userId", user.ID.ToString()),
-                new Claim("roleId", user.RoleID.ToString()),
-                new Claim("groupId", user.GroupID.ToString())
+                new Claim("roleName", roleName),
+                new Claim("groupName", groupName)
             };
+
+            var expiryInDays = int.Parse(_configuration["JwtSettings:ExpiryInDays"] ?? "1");
 
             var token = new JwtSecurityToken(
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.UtcNow.AddDays(expiryInDays),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public ClaimsPrincipal DecodeJwtToken(string token)
+        {
+            var secret = _configuration["JwtSettings:Secret"] ?? throw new ArgumentNullException("JwtSettings:Secret");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = key,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true
+            };
+
+            try
+            {
+                var principal = tokenHandler.ValidateToken(token, validationParameters, out var validatedToken);
+                return principal;
+            }
+            catch (SecurityTokenExpiredException)
+            {
+                throw new SecurityTokenException("Token has expired");
+            }
+            catch (SecurityTokenInvalidSignatureException)
+            {
+                throw new SecurityTokenException("Invalid token signature");
+            }
+            catch (Exception)
+            {
+                throw new SecurityTokenException("Invalid token");
+            }
         }
     }
 }
