@@ -5,7 +5,7 @@ using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
+using System.Text.RegularExpressions;
 
 namespace SewingFactory.Services.Service
 {
@@ -14,25 +14,32 @@ namespace SewingFactory.Services.Service
         private readonly DatabaseContext _dbContext;
         private readonly IUserService _userService;
         private readonly IProductService _productService;
-        private readonly IRoleService _roleService;
+    
+        //Predefined constants
+        private readonly Guid ORDER_MANAGER_ROLE_ID = new Guid("B4811F59-6537-41A9-890D-D41F8A7475A8");
 
-        public OrderService(DatabaseContext dbContext, IUserService userService, IProductService productService, IRoleService roleService)
+        private readonly Guid CASHIER_ROLE_ID = new Guid("9D621DC0-FF6F-47B7-87E2-758383F4B13F");
+
+        public OrderService(DatabaseContext dbContext, IUserService userService, IProductService productService)
         {
             _dbContext = dbContext;
             _userService = userService;
             _productService = productService;
-            _roleService = roleService;
         }
 
+        // Add a new order to database
         public async Task<bool> AddOrder(AddOrderDTO dto)
         {
+            var product = await _productService.GetProduct(dto.ProductID);
+            double? totalAmount = product.Price * dto.Quantity;
+
             var order = new Order()
             {
                 ProductID = dto.ProductID,
                 Quantity = dto.Quantity,
                 OrderDate = DateTime.Now,
                 FinishedDate = null,
-                TotalAmount = dto.TotalAmount,
+                TotalAmount = totalAmount,
                 UserID = dto.UserID,
                 Status = "Not Started",
                 CustomerName = dto.CustomerName,
@@ -40,11 +47,12 @@ namespace SewingFactory.Services.Service
             };
 
             _dbContext.Orders.Add(order);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(); // Save changes asynchronously to database
 
             return true;
         }
 
+        // Show all orders info at human view point
         public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList()
         {
             IEnumerable<Order> orderList = await GetOrderList();
@@ -76,6 +84,7 @@ namespace SewingFactory.Services.Service
             return order;
         }
 
+        // Show order info at human view point
         public async Task<GetOrderDTO> GetOrderDTO(Guid orderID)
         {
             var order = await GetOrder(orderID);
@@ -100,20 +109,49 @@ namespace SewingFactory.Services.Service
             return await _dbContext.Orders.ToListAsync();
         }
 
-        public async Task<string> IsGenerallyValidated(Guid userID)
+        // Validate all basic data that most methods in order controller use
+        public async Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone)
         {
-            if (await _userService.IsValidUser(userID) is false)
+            // Validate Product if they are null or disable
+            var product = await _productService.GetProduct(productID);
+            if (!(product?.Status ?? false)) 
             {
-                return "Invalid user";
+                return "Invalid Product";
             }
 
-            var user = await _userService.GetUser(userID);
-            var userRole = await _roleService.GetRoleName(user.RoleID);
-            if (userRole != "Order Manager")
+            // Validate Quantity
+            if (quantity < 1)
             {
-                return "You don't have permission to use this feature";
+                return "Invalid Quantity";
             }
-            return null;
+
+            // Validate CustomerName
+            if (string.IsNullOrWhiteSpace(CustomerName))
+            {
+                return "Customer Name is required";
+            }
+
+            // Only accept character in CustomerName 
+            var nameRegex = new Regex(@"^[a-zA-Z]+$");
+            if (!nameRegex.IsMatch(CustomerName))
+            {
+                return "Customer Name must contain only alphabetic characters";
+            }
+
+            // Validate CustomerPhone
+            if (string.IsNullOrWhiteSpace(CustomerPhone))
+            {
+                return "Customer Phone is required";
+            }
+
+            // Validate phone number format (555-6783-89731)
+            var phoneRegex = new Regex(@"^\d{3}-\d{4}-\d{3,4}$");
+            if (!phoneRegex.IsMatch(CustomerPhone))
+            {
+                return "Invalid Phone Number format. Use ###-####-### or ###-####-####";
+            }
+
+            return null; // Null mean no error
         }
 
         public async Task<bool> IsValidOrder(Guid orderID)
@@ -126,16 +164,58 @@ namespace SewingFactory.Services.Service
             return true;
         }
 
+        public bool IsValidStatusFormat(string? status)
+        {
+            if (string.IsNullOrWhiteSpace(status))
+            {
+                return false;
+            }
+
+            switch (status) // Check status string format
+            {
+                case "Not Started":
+                    return true;
+                case "In Progress":
+                    return true;
+                case "Done":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        // Check if the user who uses the method is valid user with cashier role
+        public async Task<bool> IsValidUserForAddOrderFeature(Guid userId)
+        {
+            var user = await _userService.GetUser(userId);
+            if (user?.RoleID == CASHIER_ROLE_ID)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // Check if the user who uses the method is valid user with order manager role
+        public async Task<bool> IsValidUserForUpdateOrderFeature(Guid userId)
+        {
+            var user = await _userService.GetUser(userId);
+            if (user?.RoleID == ORDER_MANAGER_ROLE_ID)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        // Update status to existed order
         public async Task<bool> UpdateOrder(UpdateOrderDTO dto)
         {
             var order = await GetOrder(dto.ID);
             if (order is null) { return false; }
 
             // Update the order properties with values from the DTO
-            order.UserID = dto.UserID;
             order.Status = dto.Status;
 
-            if (dto.Status == "Done")
+            if (dto.Status == "Done") // Set the Finish Date if the order is finished
             {
                 order.FinishedDate = DateTime.Now;
             }
@@ -145,7 +225,7 @@ namespace SewingFactory.Services.Service
             }
 
 
-            // Save changes asynchronously
+            // Save changes asynchronously to database
             await _dbContext.SaveChangesAsync();
 
             return true;

@@ -21,6 +21,12 @@ namespace SewingFactory.Services.Interface
         
         Task<bool> UpdateOrder(UpdateOrderDTO dto);
 
-        Task<string> IsGenerallyValidated(Guid userID);
+        Task<bool> IsValidUserForAddOrderFeature(Guid userId);
+
+        Task<bool> IsValidUserForUpdateOrderFeature(Guid userId);
+
+        bool IsValidStatusFormat(string? status);
+
+        Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone);
     }
 }

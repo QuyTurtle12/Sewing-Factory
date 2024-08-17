@@ -3,6 +3,7 @@
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 using Microsoft.EntityFrameworkCore;
+using SewingFactory.Models;
 
 
 namespace SewingFactory.Services.Service
@@ -16,15 +17,26 @@ namespace SewingFactory.Services.Service
             _dbContext = dbContext;
         }
 
-        public async Task<string> GetProductName(Guid productID)
+        public async Task<Product?> GetProduct(Guid productID)
+        {
+            var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == productID);
+            return product;
+        }
+
+        public async Task<string?> GetProductName(Guid productID)
         {
             var product = await _dbContext.Products.FirstOrDefaultAsync(p => p.ID == productID);
             return product.Name;
         }
 
-        public Task<bool> IsValidProduct(Guid productID)
+        public async Task<bool> IsValidProduct(Guid productID)
         {
-            throw new NotImplementedException();
+            var product = await GetProduct(productID);
+            if (product is null)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
 using SewingFactory.Models.DTO;
-using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 
 namespace SewingFactory.Controllers
@@ -12,19 +9,14 @@ namespace SewingFactory.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly DatabaseContext _dbContext;
-        private readonly IUserService _userService;
         private readonly IOrderService _orderService;
-        private readonly IProductService _productService;
 
-        public OrdersController(DatabaseContext dbcontext, IUserService userService, IOrderService orderService, IProductService productService)
+        public OrdersController(IOrderService orderService)
         {
-            _dbContext = dbcontext;
-            _userService = userService;
             _orderService = orderService;
-            _productService = productService;
         }
 
+        // GET: api/Orders
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders()
         {
@@ -32,6 +24,7 @@ namespace SewingFactory.Controllers
             return Ok(orderList);
         }
 
+        // GET: api/Orders/{id}
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<GetOrderDTO>> GetOrder(Guid id)
@@ -40,46 +33,67 @@ namespace SewingFactory.Controllers
             return Ok(order);
         }
 
+        // POST: api/Orders
         [HttpPost]
-        public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDto)
+        public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
         {
 
-            var userID = orderDto.UserID;
-            IEnumerable<User> userList = await _dbContext.Users.ToListAsync();
+            var userID = orderDTO.UserID;
 
-            string error = await _orderService.IsGenerallyValidated(userID); //Need validate product
+            if (!await _orderService.IsValidUserForAddOrderFeature(userID)) // check if user is valid
+            {
+                return BadRequest("Invalid user or user doesn't have permission to access this feature!");
+            }
+
+            orderDTO.CustomerName = orderDTO.CustomerName?.Trim();
+
+            // Check if all data is valid
+            string? error = await _orderService.IsGenerallyValidated(orderDTO.ProductID, orderDTO.Quantity, orderDTO.CustomerName, orderDTO.CustomerPhone);
 
             if (error is not null)
             {
                 return BadRequest(error);
             }
 
-            if (await _orderService.AddOrder(orderDto))
+            if (await _orderService.AddOrder(orderDTO))
             {
-                return Ok(orderDto);
+                return Ok(orderDTO);
             }
 
             return BadRequest("Unable to add order");
         }
 
 
+        // PUT: api/Orders
         [HttpPut]
-        public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDto)
+        public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
         {
 
-            var userID = orderDto.UserID;
-            IEnumerable<User> userList = await _dbContext.Users.ToListAsync();
+            // Waiting for JWT
 
-            string error = await _orderService.IsGenerallyValidated(userID);
+            //var userID = orderDTO.UserID;
 
-            if (error is not null)
+            //if (!await _orderService.IsValidUser(userID)) // Check user authority
+            //{
+            //    return BadRequest("Invalid user or user doesn't have permission to access this feature!");
+            //}
+
+            if (!await _orderService.IsValidOrder(orderDTO.ID))
             {
-                return BadRequest(error);
+                return BadRequest("Invalid Order ID");
             }
 
-            if (await _orderService.UpdateOrder(orderDto))
+            orderDTO.Status = orderDTO.Status?.Trim(); //Modified status string,
+                                                       //'   Hello, World!   ' -> 'Hello, World!'
+
+            if (!_orderService.IsValidStatusFormat(orderDTO.Status))
             {
-                return Ok(orderDto);
+                return BadRequest($"Status {orderDTO.Status} is not valid format");
+            }
+
+            if (await _orderService.UpdateOrder(orderDTO))
+            {
+                return Ok(orderDTO);
             }
 
             return BadRequest("Unable to update order");
