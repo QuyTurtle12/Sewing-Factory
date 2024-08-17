@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Repositories.DBContext;
+using SewingFactory.Services.Interface;
+using SewingFactory.Services.Service;
 
 namespace SewingFactory
 {
@@ -9,7 +11,19 @@ namespace SewingFactory
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // Configure JSON options with ReferenceHandler.Preserve
+            builder.Services.AddControllers().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
+            });
+
             // Add services to the container.
+            // Register Services in Dependency Injection Container
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
+
             builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
