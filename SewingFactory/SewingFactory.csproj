@@ -23,11 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\SewingFactory.Repository\SewingFactory.Repository.csproj" />
+    <ProjectReference Include="..\SewingFactory.Services\SewingFactory.Services.csproj" />
   </ItemGroup>
 
 </Project>

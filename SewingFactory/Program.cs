@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Repositories.DBContext;
+using SewingFactory.Services.Service;
 
 namespace SewingFactory
 {
@@ -17,6 +18,9 @@ namespace SewingFactory
             // Configure the DbContext
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Register the UserService
+            builder.Services.AddScoped<UserService>();
 
             var app = builder.Build();
 
