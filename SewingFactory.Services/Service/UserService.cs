@@ -16,7 +16,7 @@ namespace SewingFactory.Services.Service
         private readonly IConfiguration _configuration;
         private readonly ITokenService _tokenService;
 
-        public UserSService(DatabaseContext dbContext, IConfiguration configuration, ITokenService tokenService)
+        public UserService(DatabaseContext dbContext, IConfiguration configuration, ITokenService tokenService)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
