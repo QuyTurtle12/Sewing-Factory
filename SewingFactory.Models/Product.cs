@@ -6,7 +6,6 @@ namespace SewingFactory.Models
     {
         [Key]
         public Guid ID { get; set; } // Primary key
-
         public string? Name { get; set; }
         public Guid CategoryID { get; set; }
         public double? Price { get; set; }
@@ -16,9 +15,9 @@ namespace SewingFactory.Models
 
         public Product() { }
 
-        public Product(Guid id, string? name, Guid categoryID, double? price)
+        public Product(string? name, Guid categoryID, double? price)
         {
-            ID = id;
+            ID = Guid.NewGuid();
             Name = name;
             CategoryID = categoryID;
             Price = price;
