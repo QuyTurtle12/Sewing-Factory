@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Repositories.DBContext;
+using SewingFactory.Services.Service;
+using Microsoft.OpenApi.Models;
 using SewingFactory.Services.Interface;
 using SewingFactory.Services.Service;
 
@@ -24,14 +26,27 @@ namespace SewingFactory
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
 
-            builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+            builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
+                policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+
+            // Configure Swagger
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sewing Factory API", Version = "v1" });
+            });
 
             // Configure the DbContext
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Register the Services
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<TaskService>();
+            builder.Services.AddSingleton<ITokenService, TokenService>();
 
             var app = builder.Build();
 
@@ -60,6 +75,10 @@ namespace SewingFactory
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+
+            app.UseCors();
             app.UseAuthorization();
             app.MapControllers();
 
