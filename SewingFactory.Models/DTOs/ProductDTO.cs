@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SewingFactory.Models
+namespace SewingFactory.Models.DTOs
 {
     public class ProductDTO
     {

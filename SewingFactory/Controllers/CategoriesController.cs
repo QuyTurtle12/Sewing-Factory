@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Repositories.DBContext;
 
 namespace SewingFactory.Controllers
@@ -45,14 +46,21 @@ namespace SewingFactory.Controllers
         // PUT: api/Categories/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(Guid id, Category category)
+        public async Task<IActionResult> PutCategory(Guid id, CategoryDTO categoryDTO)
         {
-            if (id != category.ID)
+            // Validate that Name is not null, empty, or whitespace
+            if (string.IsNullOrWhiteSpace(categoryDTO.Name))
             {
-                return BadRequest();
+                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
+            }
+            var categoryNameExists = await _context.Categories.AnyAsync(c => c.Name.Equals(categoryDTO.Name));
+            if (categoryNameExists)
+            {
+                return BadRequest(new { message = "This category name is already exists." });
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            Category newCategory = new Category(categoryDTO.Name);
+            _context.Entry(newCategory).State = EntityState.Modified;
 
             try
             {
@@ -76,30 +84,41 @@ namespace SewingFactory.Controllers
         // POST: api/Categories
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
+        public async Task<ActionResult<Category>> PostCategory(CategoryDTO categoryDTO)
         {
-            Category newCategory = new Category(category.Name);
+            // Validate that Name is not null, empty, or whitespace
+            if (string.IsNullOrWhiteSpace(categoryDTO.Name))
+            {
+                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
+            }
+            var categoryNameExists = await _context.Categories.AnyAsync(c => c.Name.Equals(categoryDTO.Name));
+            if (categoryNameExists)
+            {
+                return BadRequest(new { message = "This category name is already exists." });
+            }
+
+            Category newCategory = new Category(categoryDTO.Name);
             _context.Categories.Add(newCategory);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction("GetCategory", new { id = newCategory.ID }, newCategory);
         }
 
-        // DELETE: api/Categories/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteCategory(Guid id)
-        //{
-        //    var category = await _context.Categories.FindAsync(id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
+        //DELETE: api/Categories/5 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteCategory(Guid id) //hard-delete
+        {
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
+            {
+                return NotFound();
+            }
 
-        //    _context.Categories.Remove(category);
-        //    await _context.SaveChangesAsync();
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
 
-        //    return NoContent();
-        //}
+            return NoContent();
+        }
 
         private bool CategoryExists(Guid id)
         {

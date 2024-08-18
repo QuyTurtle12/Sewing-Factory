@@ -19,6 +19,7 @@ namespace SewingFactory.Models
             Name = name;
             CategoryID = categoryID;
             Price = price;
+            Status = true; // Default status is true
         }
     }
 }

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Repositories.DBContext;
 
 namespace SewingFactory.Controllers
@@ -23,51 +23,114 @@ namespace SewingFactory.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            var productsWithCategory = await _context.Products
+                .Join(
+                    _context.Categories,
+                    product => product.CategoryID,
+                    category => category.ID,
+                    (product, category) => new
+                    {
+                        product.ID,
+                        product.Name,
+                        CategoryName = category.Name,
+                        product.Price,
+                        product.Status
+                    })
+                .ToListAsync();
+
+
+            return Ok(productsWithCategory);
+        }
+
+        [HttpGet("GetAllExistProducts")]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts()
+        {
+            var productsWithCategory = await _context.Products
+                .Where(p => p.Status == true) // Filter products with status == true
+                .Join(
+                    _context.Categories,
+                    product => product.CategoryID,
+                    category => category.ID,
+                    (product, category) => new
+                    {
+                        product.ID,
+                        product.Name,
+                        CategoryName = category.Name,
+                        product.Price,
+                        product.Status
+                    })
+                .ToListAsync();
+
+
+            return Ok(productsWithCategory);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(Guid id)
+        public async Task<ActionResult<object>> GetProduct(Guid id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var productWithCategory = await _context.Products
+                .Join(
+                    _context.Categories,
+                    product => product.CategoryID,
+                    category => category.ID,
+                    (product, category) => new
+                    {
+                        product.ID,
+                        product.Name,
+                        CategoryName = category.Name,
+                        product.Price,
+                        product.Status
+                    })
+                .FirstOrDefaultAsync(p => p.ID == id);
 
-            if (product == null)
+            if (productWithCategory == null)
             {
-                return NotFound();
+                return NotFound(new { message = "Product not found." });
             }
 
-            return product;
+            return Ok(productWithCategory);
         }
 
         // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, Product product)
+        public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
         {
-            // Check if the product exists
+            // Validate that Name is not null, empty, or whitespace
+            if (string.IsNullOrWhiteSpace(productDTO.Name))
+            {
+                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
+            }
+
+            // Validate that CategoryID is not an empty GUID
+            if (productDTO.CategoryID == Guid.Empty)
+            {
+                return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
+            }
+
+            // Validate that Price is greater than 0
+            if (productDTO.Price <= 0)
+            {
+                return BadRequest(new { message = "Price must be greater than 0." });
+            }
+
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
             {
                 return NotFound(new { message = "Product not found." });
             }
-            // Check if the CategoryID exists in the Categories table
-            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == product.CategoryID);
+
+            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
             if (!categoryExists)
             {
                 return NotFound(new { message = "Category not found." });
             }
-            if (product.Price <= 0)
-            {
-                return BadRequest(new { message = "Price must be greater than 0." });
-            }
 
-            // Map the ProductDTO to the existing Product entity
-            existingProduct.Name = product.Name;
-            existingProduct.CategoryID = product.CategoryID;
-            existingProduct.Price = product.Price;
+            existingProduct.Name = productDTO.Name;
+            existingProduct.CategoryID = productDTO.CategoryID;
+            existingProduct.Price = productDTO.Price;
 
             _context.Entry(existingProduct).State = EntityState.Modified;
 
@@ -91,22 +154,35 @@ namespace SewingFactory.Controllers
         }
 
         // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
         {
-            // Check if the CategoryID exists in the Categories table
-            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == product.CategoryID);
-            if (!categoryExists)
+            // Validate that Name is not null, empty, or whitespace
+            if (string.IsNullOrWhiteSpace(productDTO.Name))
             {
-                return NotFound(new { message = "Category not found." });
+                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
             }
-            if(product.Price <= 0)
+
+            // Validate that CategoryID is not an empty GUID
+            if (productDTO.CategoryID == Guid.Empty)
+            {
+                return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
+            }
+
+            // Validate that Price is greater than 0
+            if (productDTO.Price <= 0)
             {
                 return BadRequest(new { message = "Price must be greater than 0." });
             }
 
-            Product newProduct = new Product(product.Name, product.CategoryID, product.Price);
+            // Check if the CategoryID exists in the Categories table
+            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            if (!categoryExists)
+            {
+                return NotFound(new { message = "Category not found." });
+            }
+
+            Product newProduct = new Product(productDTO.Name, productDTO.CategoryID, productDTO.Price);
 
             _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
@@ -114,21 +190,23 @@ namespace SewingFactory.Controllers
             return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
         }
 
-        // DELETE: api/Products/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteProduct(Guid id)
-        //{
-        //    var product = await _context.Products.FindAsync(id);
-        //    if (product == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // PUT: api/Products/ChangeStatus/5
+        [HttpPut("ChangeStatus/{id}")]
+        public async Task<IActionResult> ChangeProductStatus(Guid id)
+        {
+            var existingProduct = await _context.Products.FindAsync(id);
+            if (existingProduct == null)
+            {
+                return NotFound(new { message = "Product not found." });
+            }
 
-        //    _context.Products.Remove(product);
-        //    await _context.SaveChangesAsync();
+            existingProduct.Status = !existingProduct.Status;
 
-        //    return NoContent();
-        //}
+            _context.Entry(existingProduct).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
 
         private bool ProductExists(Guid id)
         {
