@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SewingFactory.Services.Interface;
 
 namespace SewingFactory
 {
@@ -19,6 +20,12 @@ namespace SewingFactory
             // Add services to the container.
             builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
                 policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+
+            // Add services to the container.
+            // Register Services in Dependency Injection Container
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
