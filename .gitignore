@@ -402,3 +402,12 @@ FodyWeavers.xsd
 *.sln.iml
 /SewingFactory/appsettings.json
 /SewingFactory/appsettings.json
+
+# Ignore NuGet files
+**/obj/*.nuget.dgspec.json
+**/obj/*.nuget.g.props
+**/obj/project.assets.json
+**/obj/project.nuget.cache
+
+# Ignore appsettings.json if you want to keep it local (optional)
+appsettings.json
