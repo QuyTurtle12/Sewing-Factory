@@ -1,6 +1,4 @@
-﻿
-
-using SewingFactory.Models;
+﻿using SewingFactory.Models;
 
 namespace SewingFactory.Services.Interface
 {

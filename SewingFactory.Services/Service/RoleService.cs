@@ -1,6 +1,4 @@
-﻿
-using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models;
+﻿using Microsoft.EntityFrameworkCore;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 
@@ -12,7 +10,7 @@ namespace SewingFactory.Services.Service
 
         public RoleService(DatabaseContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         public async Task<string?> GetRoleName(Guid roleID)

@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 using SewingFactory.Repositories.DBContext;
@@ -22,9 +20,9 @@ namespace SewingFactory.Services.Service
 
         public OrderService(DatabaseContext dbContext, IUserService userService, IProductService productService)
         {
-            _dbContext = dbContext;
-            _userService = userService;
-            _productService = productService;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _productService = productService ?? throw new ArgumentNullException(nameof(productService));
         }
 
         // Add a new order to database

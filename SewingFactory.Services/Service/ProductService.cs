@@ -1,6 +1,4 @@
-﻿
-
-using SewingFactory.Repositories.DBContext;
+﻿using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
@@ -14,7 +12,7 @@ namespace SewingFactory.Services.Service
 
         public ProductService(DatabaseContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         public async Task<Product?> GetProduct(Guid productID)

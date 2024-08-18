@@ -10,9 +10,9 @@ namespace SewingFactory.Services.Service
     {
         private readonly DatabaseContext _dbContext;
 
-        public UserService(DatabaseContext _dbContext)
+        public UserService(DatabaseContext dbContext)
         {
-            this._dbContext = _dbContext;
+            this._dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         }
 
         public async Task<User> GetUser(Guid userID)

@@ -1,6 +1,4 @@
-﻿
-
-using SewingFactory.Models;
+﻿using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 
 namespace SewingFactory.Services.Interface

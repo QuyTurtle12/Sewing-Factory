@@ -1,8 +1,4 @@
-﻿
-
-using SewingFactory.Models;
-
-namespace SewingFactory.Services.Interface
+﻿namespace SewingFactory.Services.Interface
 {
     public interface IRoleService
     {
