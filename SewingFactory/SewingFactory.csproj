@@ -38,8 +38,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SewingFactory.Repository\SewingFactory.Repository.csproj" />
-    <ProjectReference Include="..\SewingFactory.Services\SewingFactory.Services.csproj" />
+    <ProjectReference Include="..\SewingFactory.Repository\SewingFactory.Repository.csproj">
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\SewingFactory.Services\SewingFactory.Services.csproj">
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

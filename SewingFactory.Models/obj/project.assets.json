@@ -4042,40 +4042,24 @@
     ]
   },
   "packageFolders": {
-<<<<<<< HEAD
     "C:\\Users\\patho\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
-=======
-    "C:\\Users\\letri\\.nuget\\packages\\": {}
->>>>>>> cd0d1503f77e42a38f7d77c2e0ccddaa3ebe563c
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-<<<<<<< HEAD
       "projectUniqueName": "D:\\WORK\\Sewing-Factory-main\\SewingFactory.Models\\SewingFactory.Models.csproj",
       "projectName": "SewingFactory.Models",
       "projectPath": "D:\\WORK\\Sewing-Factory-main\\SewingFactory.Models\\SewingFactory.Models.csproj",
       "packagesPath": "C:\\Users\\patho\\.nuget\\packages\\",
       "outputPath": "D:\\WORK\\Sewing-Factory-main\\SewingFactory.Models\\obj\\",
-=======
-      "projectUniqueName": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
-      "projectName": "SewingFactory.Models",
-      "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
-      "packagesPath": "C:\\Users\\letri\\.nuget\\packages\\",
-      "outputPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\obj\\",
->>>>>>> cd0d1503f77e42a38f7d77c2e0ccddaa3ebe563c
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-<<<<<<< HEAD
         "C:\\Users\\patho\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-=======
-        "C:\\Users\\letri\\AppData\\Roaming\\NuGet\\NuGet.Config",
->>>>>>> cd0d1503f77e42a38f7d77c2e0ccddaa3ebe563c
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -4138,11 +4122,7 @@
             "privateAssets": "all"
           }
         },
-<<<<<<< HEAD
         "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.400/PortableRuntimeIdentifierGraph.json"
-=======
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
->>>>>>> cd0d1503f77e42a38f7d77c2e0ccddaa3ebe563c
       }
     }
   }
