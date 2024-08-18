@@ -7,7 +7,7 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using SewingFactory.Middleware;
+using System.Text.Json;
 
 namespace SewingFactory
 {
@@ -92,17 +92,25 @@ namespace SewingFactory
                     };
                 });
 
-            // Configure Authorization Policies
-            builder.Services.AddAuthorization(options =>
+            // Load and configure authorization policies from appsettings.json
+            var policiesSection = builder.Configuration.GetSection("AuthorizationPolicies");
+            var policies = policiesSection.Get<Dictionary<string, string[]>>();
+
+            if (policies != null)
             {
-                options.AddPolicy("Staff-Manager-Policy", policy =>
-                    policy.RequireClaim("roleName", "Staff Manager"));
-
-                options.AddPolicy("Product-Manager-Policy", policy =>
-                    policy.RequireClaim("roleName", "Product Manager"));
-
-                // Add more policies as needed
-            });
+                builder.Services.AddAuthorization(options =>
+                {
+                    foreach (var policy in policies)
+                    {
+                        options.AddPolicy(policy.Key, policyBuilder =>
+                            policyBuilder.RequireClaim("roleName", policy.Value));
+                    }
+                });
+            }
+            else
+            {
+                throw new InvalidOperationException("Authorization policies not configured correctly in appsettings.json.");
+            }
 
             var app = builder.Build();
 
