@@ -129,6 +129,7 @@ namespace SewingFactory.Services.Service
             //Find existing task
             var task = await _dbContext.Tasks.FindAsync(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
+
             // Update properties
             if (dto.OrderID != Guid.Empty)
             {
@@ -145,6 +146,10 @@ namespace SewingFactory.Services.Service
             }
             if (dto.Status.HasValue)
             {
+                if (dto.Status < 0 || dto.Status > 1) 
+                {
+                    throw new Exception("Task status must be in range 0 - 1");
+                }
                 task.Status = dto.Status;
             }
 
