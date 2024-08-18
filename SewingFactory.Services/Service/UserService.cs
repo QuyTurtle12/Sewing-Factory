@@ -15,6 +15,7 @@ namespace SewingFactory.Services.Service
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
 
+        // Constructor for dependency injection
         public UserService(DatabaseContext dbContext, IConfiguration configuration, IMapper mapper)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
@@ -22,6 +23,10 @@ namespace SewingFactory.Services.Service
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
+        /// <summary>
+        /// Retrieves all users from the database including their roles and groups.
+        /// </summary>
+        /// <returns>A list of UserDto objects.</returns>
         public async Task<List<UserDto>> GetAllUsersAsync()
         {
             var users = await _dbContext.Users
@@ -32,6 +37,11 @@ namespace SewingFactory.Services.Service
             return _mapper.Map<List<UserDto>>(users);
         }
 
+        /// <summary>
+        /// Retrieves a user by their ID including their role and group.
+        /// </summary>
+        /// <param name="id">The ID of the user to retrieve.</param>
+        /// <returns>A UserDto object representing the user.</returns>
         public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
             var user = await _dbContext.Users
@@ -43,6 +53,12 @@ namespace SewingFactory.Services.Service
             return _mapper.Map<UserDto>(user);
         }
 
+        /// <summary>
+        /// Updates a user's details based on the provided ID and update request.
+        /// </summary>
+        /// <param name="id">The ID of the user to update.</param>
+        /// <param name="request">The update details.</param>
+        /// <returns>The updated UserDto object.</returns>
         public async Task<UserDto> UpdateUserAsync(Guid id, UpdateDto request)
         {
             var user = await _dbContext.Users
@@ -93,6 +109,11 @@ namespace SewingFactory.Services.Service
             return _mapper.Map<UserDto>(user);
         }
 
+        /// <summary>
+        /// Creates a new user based on the provided creation details.
+        /// </summary>
+        /// <param name="createUser">The user creation details.</param>
+        /// <returns>The created UserDto object.</returns>
         public async Task<UserDto> CreateUserAsync(CreateDto createUser)
         {
             if (createUser == null) throw new ArgumentNullException(nameof(createUser));
@@ -101,13 +122,41 @@ namespace SewingFactory.Services.Service
             ValidateCreateUserDto(createUser);
 
             var user = _mapper.Map<User>(createUser);
-
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
             return _mapper.Map<UserDto>(user);
         }
 
+        /// <summary>
+        /// Updates the status of a user based on the provided ID and status details.
+        /// </summary>
+        /// <param name="id">The ID of the user to update.</param>
+        /// <param name="statusDto">The status update details.</param>
+        /// <returns>The updated UserDto object.</returns>
+        public async Task<UserDto> UpdateUserStatusAsync(Guid id, UpdateUserStatusDto statusDto)
+        {
+            var user = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .FirstOrDefaultAsync(u => u.ID == id)
+                ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+
+            user.Status = statusDto.Status;
+
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+
+            // Create a UserDto and set the role and group names manually
+            var userDto = _mapper.Map<UserDto>(user);
+
+            return userDto;
+        }
+
+        /// <summary>
+        /// Deletes a user based on the provided ID.
+        /// </summary>
+        /// <param name="id">The ID of the user to delete.</param>
         public async System.Threading.Tasks.Task DeleteUserAsync(Guid id)
         {
             var user = await _dbContext.Users.FindAsync(id)
@@ -117,6 +166,7 @@ namespace SewingFactory.Services.Service
             await _dbContext.SaveChangesAsync();
         }
 
+        // Validate the creation DTO
         private void ValidateCreateUserDto(CreateDto request)
         {
             var context = new ValidationContext(request);
@@ -136,6 +186,7 @@ namespace SewingFactory.Services.Service
             }
         }
 
+        // Validate the update DTO
         private void ValidateUpdateUserDto(Guid id, UpdateDto request)
         {
             var context = new ValidationContext(request);
