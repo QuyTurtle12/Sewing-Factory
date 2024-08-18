@@ -11,11 +11,8 @@ namespace SewingFactory.Controllers
     {
         private readonly TaskService _taskService;
 
-        private readonly DatabaseContext _context;
-
-        public TasksController(DatabaseContext context, TaskService taskService)
+        public TasksController(TaskService taskService)
         {
-            _context = context;
             _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService)); ;
         }
 
