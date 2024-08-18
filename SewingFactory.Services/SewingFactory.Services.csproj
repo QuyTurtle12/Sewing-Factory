@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SewingFactory.Core\SewingFactory.Core.csproj" />
     <ProjectReference Include="..\SewingFactory.Repository\SewingFactory.Repository.csproj">
       <Private>True</Private>
     </ProjectReference>

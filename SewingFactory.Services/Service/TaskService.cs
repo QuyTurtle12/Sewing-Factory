@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Dto;
+using SewingFactory.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +22,12 @@ namespace SewingFactory.Services.Service
 
         public TaskService(DatabaseContext dbContext, IConfiguration configuration)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _dbContext = dbContext;
+            _configuration = configuration;
         }
 
         //Get all tasks
-        public async Task<IEnumerable<TaskResponseDto>> GetAllTasks()
+        public async Task<IEnumerable<TaskResponseDto>> GetAllTasks(int pageNumber, int pageSize)
         {
             var tasks = await _dbContext.Tasks
                 .Include(t => t.Order)
@@ -34,6 +35,7 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
+            //Transfer to responseDto to display objects
             var taskResponseDtos = tasks.Select(t => new TaskResponseDto
             {
                 ID = t.ID,
@@ -48,7 +50,9 @@ namespace SewingFactory.Services.Service
 
             });
 
-            return taskResponseDtos;
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
         }
 
         //Get task by id

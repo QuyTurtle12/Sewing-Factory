@@ -18,11 +18,11 @@ namespace SewingFactory.Controllers
 
         // GET: api/Tasks
         [HttpGet]
-        public async Task<IActionResult> GetTasks()
+        public async Task<IActionResult> GetTasks(int page, int pageSize)
         {
             try
             {
-                return Ok(await _taskService.GetAllTasks());
+                return Ok(await _taskService.GetAllTasks(page, pageSize));
             }
             catch (Exception ex)
             {
