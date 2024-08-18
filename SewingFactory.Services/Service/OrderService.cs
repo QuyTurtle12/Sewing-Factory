@@ -185,8 +185,8 @@ namespace SewingFactory.Services.Service
         // Check if the user who uses the method is valid user with cashier role
         public async Task<bool> IsValidUserForAddOrderFeature(Guid userId)
         {
-            var user = _userService.GetUserById(userId);
-            if (user?.RoleID == CASHIER_ROLE_ID)
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user?.Role?.RoleID == CASHIER_ROLE_ID)
             {
                 return true;
             }
@@ -196,8 +196,8 @@ namespace SewingFactory.Services.Service
         // Check if the user who uses the method is valid user with order manager role
         public async Task<bool> IsValidUserForUpdateOrderFeature(Guid userId)
         {
-            var user = _userService.GetUserById(userId);
-            if (user?.RoleID == ORDER_MANAGER_ROLE_ID)
+            var user = await _userService.GetUserByIdAsync(userId);
+            if (user?.Role?.RoleID == ORDER_MANAGER_ROLE_ID)
             {
                 return true;
             }

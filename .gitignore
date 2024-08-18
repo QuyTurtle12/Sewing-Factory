@@ -12,6 +12,7 @@
 *.json
 *.props
 *.cache
+appsettings.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -399,3 +400,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/SewingFactory/appsettings.json
+/SewingFactory/appsettings.json

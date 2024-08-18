@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "zKg/tRLQUWFnChhRGYTqq5hLMvbZxfziaSx0OBFz6D2dXljgpw5cb/0a457+NhgUq3KTT5BXgi1rl0ZWX5452g==",
+  "dgSpecHash": "tYryJxVsmKhAUWhSL7T1yYG02uEN1A6Qx6gPhhZmHc3RQ4wX6Z2wZsLQycHS+ADr+oYqe7TnV+KOKvtK+MMSgg==",
   "success": true,
   "projectFilePath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
   "expectedPackageFiles": [
@@ -79,12 +79,12 @@
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.extensions.primitives\\8.0.0\\microsoft.extensions.primitives.8.0.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identity.client\\4.56.0\\microsoft.identity.client.4.56.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identity.client.extensions.msal\\4.56.0\\microsoft.identity.client.extensions.msal.4.56.0.nupkg.sha512",
-    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.abstractions\\6.35.0\\microsoft.identitymodel.abstractions.6.35.0.nupkg.sha512",
+    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.0.1\\microsoft.identitymodel.abstractions.8.0.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\6.35.0\\microsoft.identitymodel.jsonwebtokens.6.35.0.nupkg.sha512",
-    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.logging\\6.35.0\\microsoft.identitymodel.logging.6.35.0.nupkg.sha512",
+    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.logging\\8.0.1\\microsoft.identitymodel.logging.8.0.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.protocols\\6.35.0\\microsoft.identitymodel.protocols.6.35.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.protocols.openidconnect\\6.35.0\\microsoft.identitymodel.protocols.openidconnect.6.35.0.nupkg.sha512",
-    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.35.0\\microsoft.identitymodel.tokens.6.35.0.nupkg.sha512",
+    "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.0.1\\microsoft.identitymodel.tokens.8.0.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.net.http.headers\\2.2.0\\microsoft.net.http.headers.2.2.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
