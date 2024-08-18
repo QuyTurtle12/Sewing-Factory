@@ -9,7 +9,6 @@ using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Dto;
 using SewingFactory.Services.Service;
-using Task = SewingFactory.Models.Task;
 
 namespace SewingFactory.Controllers
 {
@@ -19,11 +18,8 @@ namespace SewingFactory.Controllers
     {
         private readonly TaskService _taskService;
 
-        private readonly DatabaseContext _context;
-
-        public TasksController(DatabaseContext context, TaskService taskService)
+        public TasksController(TaskService taskService)
         {
-            _context = context;
             _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService)); ;
         }
 
