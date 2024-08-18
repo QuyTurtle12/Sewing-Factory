@@ -9,6 +9,7 @@ namespace SewingFactory.Models
         public string? Name { get; set; }
         public Guid CategoryID { get; set; }
         public double? Price { get; set; }
+        public bool? Status { get; set; }
 
         public Product() { }
 
