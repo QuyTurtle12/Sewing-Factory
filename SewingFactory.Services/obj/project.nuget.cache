@@ -1,13 +1,14 @@
 {
   "version": 2,
-  "dgSpecHash": "tYryJxVsmKhAUWhSL7T1yYG02uEN1A6Qx6gPhhZmHc3RQ4wX6Z2wZsLQycHS+ADr+oYqe7TnV+KOKvtK+MMSgg==",
+  "dgSpecHash": "ttcDogjWLPkYT2751QrH7nYuYLTPjcbO4jJMqRBj7V2NqeFFaeNP9XM228YQneLPUhCWKpa74v8WEycB1ccg+g==",
   "success": true,
-  "projectFilePath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
+  "projectFilePath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\ADMIN\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\azure.core\\1.35.0\\azure.core.1.35.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\azure.identity\\1.10.3\\azure.identity.1.10.3.nupkg.sha512",
+    "C:\\Users\\ADMIN\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.aspnetcore\\2.2.0\\microsoft.aspnetcore.2.2.0.nupkg.sha512",
     "C:\\Users\\ADMIN\\.nuget\\packages\\microsoft.aspnetcore.authentication.abstractions\\2.2.0\\microsoft.aspnetcore.authentication.abstractions.2.2.0.nupkg.sha512",

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj": {}
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj": {}
   },
   "projects": {
-    "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
         "projectName": "SewingFactory.Models",
-        "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
-        "packagesPath": "C:\\Users\\letri\\.nuget\\packages\\",
-        "outputPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\obj\\",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\letri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -34,11 +34,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -50,12 +45,6 @@
               "version": "[2.2.0, )"
             },
             "Microsoft.EntityFrameworkCore": {
-              "target": "Package",
-              "version": "[8.0.8, )"
-            },
-            "Microsoft.EntityFrameworkCore.Tools": {
-              "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
-              "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.8, )"
             }
@@ -76,21 +65,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
         "projectName": "SewingFactory.Repository",
-        "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
-        "packagesPath": "C:\\Users\\letri\\.nuget\\packages\\",
-        "outputPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\obj\\",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\letri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -104,8 +93,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj": {
-                "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj"
+              "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj": {
+                "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Models\\SewingFactory.Models.csproj"
               }
             }
           }
@@ -114,11 +103,6 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -148,6 +132,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.0.1, )"
             }
           },
           "imports": [
@@ -166,21 +154,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
         "projectName": "SewingFactory.Services",
-        "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
-        "packagesPath": "C:\\Users\\letri\\.nuget\\packages\\",
-        "outputPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\obj\\",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\letri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -194,8 +182,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
-                "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj"
+              "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
+                "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj"
               }
             }
           }
@@ -204,17 +192,16 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
             "BCrypt.Net-Next": {
               "target": "Package",
               "version": "[4.0.3, )"
@@ -239,11 +226,7 @@
               "target": "Package",
               "version": "[8.0.8, )"
             },
-            "Microsoft.IdentityModel.JsonWebTokens": {
-              "target": "Package",
-              "version": "[8.0.1, )"
-            },
-            "System.IdentityModel.Tokens.Jwt": {
+            "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
               "version": "[8.0.1, )"
             }
@@ -264,21 +247,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj": {
+    "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj",
+        "projectUniqueName": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj",
         "projectName": "SewingFactory",
-        "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj",
-        "packagesPath": "C:\\Users\\letri\\.nuget\\packages\\",
-        "outputPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory\\obj\\",
+        "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory\\SewingFactory.csproj",
+        "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\letri\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -292,11 +275,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
-                "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj"
+              "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj": {
+                "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Repository\\SewingFactory.Repository.csproj"
               },
-              "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {
-                "projectPath": "D:\\ALL STUFF\\C#\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj"
+              "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj": {
+                "projectPath": "C:\\Users\\ADMIN\\Documents\\2024 FAll 2024\\Sewing Factory\\Sewing-Factory\\SewingFactory.Services\\SewingFactory.Services.csproj"
               }
             }
           }
@@ -305,20 +288,23 @@
           "warnAsError": [
             "NU1605"
           ]
-        },
-        "restoreAuditProperties": {
-          "enableAudit": "true",
-          "auditLevel": "low",
-          "auditMode": "direct"
         }
       },
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
             "Microsoft.AspNetCore": {
               "target": "Package",
               "version": "[2.2.0, )"
+            },
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
+              "target": "Package",
+              "version": "[8.0.8, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
@@ -339,6 +325,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.8, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[8.0.1, )"
             },
             "Microsoft.VisualStudio.Web.CodeGeneration.Design": {
               "target": "Package",
@@ -368,7 +358,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.204/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.100/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
