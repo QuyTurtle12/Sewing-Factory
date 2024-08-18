@@ -8,6 +8,6 @@ namespace SewingFactory.Services.Interface
 
         Task<string?> GetProductName(Guid productID);
 
-        Task<Product?> GetProduct(Guid productID); 
+        Task<Product?> GetProduct(Guid productID);
     }
 }

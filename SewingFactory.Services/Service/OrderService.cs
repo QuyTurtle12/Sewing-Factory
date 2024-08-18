@@ -12,7 +12,7 @@ namespace SewingFactory.Services.Service
         private readonly DatabaseContext _dbContext;
         private readonly UserService _userService;
         private readonly IProductService _productService;
-    
+
         //Predefined constants
         private readonly Guid ORDER_MANAGER_ROLE_ID = new Guid("B4811F59-6537-41A9-890D-D41F8A7475A8");
 
@@ -112,7 +112,7 @@ namespace SewingFactory.Services.Service
         {
             // Validate Product if they are null or disable
             var product = await _productService.GetProduct(productID);
-            if (!(product?.Status ?? false)) 
+            if (!(product?.Status ?? false))
             {
                 return "Invalid Product";
             }
