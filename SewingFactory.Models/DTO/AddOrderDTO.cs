@@ -1,5 +1,3 @@
-﻿
-
 namespace SewingFactory.Models.DTO
 {
     public class AddOrderDTO
