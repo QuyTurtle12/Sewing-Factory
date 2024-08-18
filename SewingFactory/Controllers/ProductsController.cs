@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
+using SewingFactory.Models.Models;
 using SewingFactory.Repositories.DBContext;
 
 namespace SewingFactory.Controllers
