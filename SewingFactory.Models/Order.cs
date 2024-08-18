@@ -12,7 +12,7 @@ namespace SewingFactory.Models
         public Guid ProductID { get; set; }
         public int? Quantity { get; set; }
         public double? TotalAmount { get; set; }
-        public Guid UserID { get; set; }
+        public Guid UserID { get; set; } // Person who created this order
         public string? Status { get; set; }
         public string? CustomerName { get; set; }
         public string? CustomerPhone { get; set; }

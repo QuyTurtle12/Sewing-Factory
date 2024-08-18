@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models;
+﻿using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Dto;
 using SewingFactory.Services.Service;
-using Task = SewingFactory.Models.Task;
 
 namespace SewingFactory.Controllers
 {
@@ -19,11 +11,8 @@ namespace SewingFactory.Controllers
     {
         private readonly TaskService _taskService;
 
-        private readonly DatabaseContext _context;
-
-        public TasksController(DatabaseContext context, TaskService taskService)
+        public TasksController(TaskService taskService)
         {
-            _context = context;
             _taskService = taskService ?? throw new ArgumentNullException(nameof(taskService)); ;
         }
 

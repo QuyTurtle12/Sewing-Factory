@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
@@ -204,6 +204,19 @@ namespace SewingFactory.Services.Service
             {
                 throw new ValidationException($"Username '{request.Username}' is already taken.");
             }
+        }
+
+        // Accquire user name
+        public async Task<string?> GetUserName(Guid userID)
+        {
+            var user = await GetUserByIdAsync(userID);
+            return user.Username;
+        }
+
+        // Validate if user is existed in database
+        public async Task<bool> IsValidUser(Guid userID)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == userID) is not null;
         }
     }
 }
