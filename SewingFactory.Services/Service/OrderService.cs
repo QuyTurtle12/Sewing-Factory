@@ -10,7 +10,7 @@ namespace SewingFactory.Services.Service
     public class OrderService : IOrderService
     {
         private readonly DatabaseContext _dbContext;
-        private readonly IUserService _userService;
+        private readonly UserService _userService;
         private readonly IProductService _productService;
     
         //Predefined constants
@@ -18,7 +18,7 @@ namespace SewingFactory.Services.Service
 
         private readonly Guid CASHIER_ROLE_ID = new Guid("9D621DC0-FF6F-47B7-87E2-758383F4B13F");
 
-        public OrderService(DatabaseContext dbContext, IUserService userService, IProductService productService)
+        public OrderService(DatabaseContext dbContext, UserService userService, IProductService productService)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -185,7 +185,7 @@ namespace SewingFactory.Services.Service
         // Check if the user who uses the method is valid user with cashier role
         public async Task<bool> IsValidUserForAddOrderFeature(Guid userId)
         {
-            var user = await _userService.GetUser(userId);
+            var user = _userService.GetUserById(userId);
             if (user?.RoleID == CASHIER_ROLE_ID)
             {
                 return true;
@@ -196,7 +196,7 @@ namespace SewingFactory.Services.Service
         // Check if the user who uses the method is valid user with order manager role
         public async Task<bool> IsValidUserForUpdateOrderFeature(Guid userId)
         {
-            var user = await _userService.GetUser(userId);
+            var user = _userService.GetUserById(userId);
             if (user?.RoleID == ORDER_MANAGER_ROLE_ID)
             {
                 return true;

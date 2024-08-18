@@ -3,7 +3,6 @@ using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Service;
 using Microsoft.OpenApi.Models;
 using SewingFactory.Services.Interface;
-using SewingFactory.Services.Service;
 
 namespace SewingFactory
 {
@@ -21,7 +20,6 @@ namespace SewingFactory
 
             // Add services to the container.
             // Register Services in Dependency Injection Container
-            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<IRoleService, RoleService>();

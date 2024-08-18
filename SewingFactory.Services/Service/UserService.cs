@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
@@ -138,19 +139,13 @@ namespace SewingFactory.Services.Service
         }
         public async Task<string?> GetUserName(Guid userID)
         {
-            var user = await GetUser(userID);
+            var user = GetUserById(userID);
             return user.Username;
         }
 
         public async Task<bool> IsValidUser(Guid userID)
         {
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == userID) is not null;
-        }
-        
-        public async Task<string?> GetUserName(Guid userID)
-        {
-            var user = await GetUser(userID);
-            return user.Username;
         }
     }
 }
