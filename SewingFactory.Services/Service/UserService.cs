@@ -38,6 +38,26 @@ namespace SewingFactory.Services.Service
         }
 
         /// <summary>
+        /// Retrieves a paginated list of users from the database including their roles and groups.
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve.</param>
+        /// <param name="pageSize">The number of users per page.</param>
+        /// <returns>A paginated list of UserDto objects.</returns>
+        public async Task<(List<UserDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
+        {
+            var totalCount = await _dbContext.Users.CountAsync();
+
+            var users = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (_mapper.Map<List<UserDto>>(users), totalCount);
+        }
+
+        /// <summary>
         /// Retrieves a user by their ID including their role and group.
         /// </summary>
         /// <param name="id">The ID of the user to retrieve.</param>
