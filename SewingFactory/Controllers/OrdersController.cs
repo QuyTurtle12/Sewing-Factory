@@ -17,17 +17,18 @@ namespace SewingFactory.Controllers
         public OrdersController(IOrderService orderService, ITokenService tokenService)
         {
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
-            _tokenService = tokenService;
+            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         }
 
         // GET: api/Orders
-        [Authorize(Policy = "OrderOrCashierPolicy")]
+        // Get all orders
+        [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders()
+        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders(int pageNumber, int pageSize)
         {
             try
             {
-                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllOrderDTOList();
+                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllOrderDTOList(pageNumber, pageSize);
                 return Ok(orderList);
             }
             catch (Exception ex)
@@ -38,7 +39,8 @@ namespace SewingFactory.Controllers
         }
 
         // GET: api/Orders/{id}
-        [Authorize(Policy = "OrderOrCashierPolicy")]
+        // Get 1 order by ID
+        [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<GetOrderDTO>> GetOrder(Guid id)
@@ -56,7 +58,8 @@ namespace SewingFactory.Controllers
         }
 
         // POST: api/Orders
-        [Authorize(Policy = "Cashier-Policy")]
+        // Add an order to database
+        [Authorize(Policy = "Cashier")]
         [HttpPost]
         public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
         {
@@ -107,7 +110,8 @@ namespace SewingFactory.Controllers
 
 
         // PUT: api/Orders
-        [Authorize(Policy = "Order-Manager-Policy")]
+        // Update an order to database
+        [Authorize(Policy = "Order")]
         [HttpPut]
         public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
         {

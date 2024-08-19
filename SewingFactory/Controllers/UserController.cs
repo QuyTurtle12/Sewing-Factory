@@ -23,7 +23,7 @@ namespace SewingFactory.Controllers
         /// </summary>
         /// <param name="request">The user creation request data.</param>
         /// <returns>ActionResult indicating success or failure.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody] CreateDto request)
         {
@@ -48,7 +48,7 @@ namespace SewingFactory.Controllers
         /// Requires the caller to have the Staff-Manager-Policy authorization.
         /// </summary>
         /// <returns>ActionResult with a list of users or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -70,7 +70,7 @@ namespace SewingFactory.Controllers
         /// </summary>
         /// <param name="id">The ID of the user to retrieve.</param>
         /// <returns>ActionResult with the user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "   ")]
         [HttpGet]
         [Route("{id:guid}")]
         public async Task<IActionResult> GetUserById(Guid id)
@@ -94,7 +94,7 @@ namespace SewingFactory.Controllers
         /// <param name="id">The ID of the user to update.</param>
         /// <param name="request">The update request data.</param>
         /// <returns>ActionResult with the updated user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPut]
         [Route("{id:guid}")]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateDto request)
@@ -118,7 +118,7 @@ namespace SewingFactory.Controllers
         /// <param name="id">The ID of the user whose status is to be updated.</param>
         /// <param name="statusDto">The status update request data.</param>
         /// <returns>ActionResult with the updated user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateUserStatusDto statusDto)
         {
@@ -149,7 +149,7 @@ namespace SewingFactory.Controllers
         /// </summary>
         /// <param name="id">The ID of the user to delete.</param>
         /// <returns>ActionResult indicating success or failure.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpDelete]
         [Route("{id:guid}")]
         public async Task<IActionResult> DeleteUser(Guid id)

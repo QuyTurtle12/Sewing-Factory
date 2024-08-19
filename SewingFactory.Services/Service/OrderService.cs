@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SewingFactory.Core;
 using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 using SewingFactory.Repositories.DBContext;
@@ -46,10 +47,10 @@ namespace SewingFactory.Services.Service
         }
 
         // Show all orders info at human view point
-        public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList()
+        public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList(int pageNumber, int pageSize)
         {
             IEnumerable<Order> orderList = await GetOrderList();
-            var orders = new List<GetOrderDTO>();
+            var orderDtos = new List<GetOrderDTO>();
 
             foreach (var order in orderList)
             {
@@ -65,10 +66,12 @@ namespace SewingFactory.Services.Service
                     CreatorName = await _userService.GetUserName(order.UserID),
                     ProductName = await _productService.GetProductName(order.ProductID)
                 };
-                orders.Add(orderDTO);
+                orderDtos.Add(orderDTO);
             }
 
-            return orders;
+            var orderPaginationList = new PaginatedList<GetOrderDTO>(orderDtos, pageNumber, pageSize);
+
+            return orderPaginationList.GetPaginatedItems();
         }
 
         public async Task<Order> GetOrder(Guid orderID)
@@ -81,6 +84,8 @@ namespace SewingFactory.Services.Service
         public async Task<GetOrderDTO> GetOrderDTO(Guid orderID)
         {
             var order = await GetOrder(orderID);
+
+            // Transfer order data to showable data at human view-point
             GetOrderDTO orderDTO = new GetOrderDTO()
             {
                 OrderDate = DateTime.Now,
