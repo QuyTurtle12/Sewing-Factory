@@ -120,8 +120,10 @@ namespace SewingFactory
                 {
                     foreach (var policy in policies)
                     {
+                        // Create a policy with multiple roles
                         options.AddPolicy(policy.Key, policyBuilder =>
-                            policyBuilder.RequireClaim("roleName", policy.Value));
+                        policyBuilder.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "roleName" && policy.Value.Contains(c.Value))));
                     }
                 });
             }
@@ -129,6 +131,7 @@ namespace SewingFactory
             {
                 throw new InvalidOperationException("Authorization policies not configured correctly in appsettings.json.");
             }
+
 
             var app = builder.Build();
 

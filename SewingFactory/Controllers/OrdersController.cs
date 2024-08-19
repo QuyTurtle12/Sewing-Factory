@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 using SewingFactory.Services.Interface;
+using SewingFactory.Services.Service;
 
 namespace SewingFactory.Controllers
 {
@@ -10,13 +12,16 @@ namespace SewingFactory.Controllers
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ITokenService _tokenService;
 
-        public OrdersController(IOrderService orderService)
+        public OrdersController(IOrderService orderService, ITokenService tokenService)
         {
             _orderService = orderService ?? throw new ArgumentNullException(nameof(orderService));
+            _tokenService = tokenService;
         }
 
         // GET: api/Orders
+        [Authorize(Policy = "OrderOrCashierPolicy")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders()
         {
@@ -33,6 +38,7 @@ namespace SewingFactory.Controllers
         }
 
         // GET: api/Orders/{id}
+        [Authorize(Policy = "OrderOrCashierPolicy")]
         [HttpGet]
         [Route("{id}")]
         public async Task<ActionResult<GetOrderDTO>> GetOrder(Guid id)
@@ -50,17 +56,29 @@ namespace SewingFactory.Controllers
         }
 
         // POST: api/Orders
+        [Authorize(Policy = "Cashier-Policy")]
         [HttpPost]
         public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
         {
             try
             {
-                var userID = orderDTO.UserID;
 
-                if (!await _orderService.IsValidUserForAddOrderFeature(userID)) // check if user is valid
+                // Retrieve the token from the Authorization header
+                var authorizationHeader = Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrWhiteSpace(authorizationHeader) || !authorizationHeader.StartsWith("Bearer "))
                 {
-                    return BadRequest("Invalid user or user doesn't have permission to access this feature!");
+                    return BadRequest("Authorization header is either empty or does not contain a Bearer token.");
                 }
+
+                var token = authorizationHeader.Substring("Bearer ".Length).Trim();
+                
+                var userID = _tokenService.GetUserIdFromTokenHeader(token);
+
+                if (userID == Guid.Empty) 
+                {
+                    // Handle the case where the userId claim is not a valid Guid
+                    return BadRequest("Invalid user ID format."); 
+                }  
 
                 orderDTO.CustomerName = orderDTO.CustomerName?.Trim();
 
@@ -72,7 +90,7 @@ namespace SewingFactory.Controllers
                     return BadRequest(error);
                 }
 
-                if (await _orderService.AddOrder(orderDTO))
+                if (await _orderService.AddOrder(orderDTO, userID))
                 {
                     return Ok(orderDTO);
                 }
@@ -89,19 +107,12 @@ namespace SewingFactory.Controllers
 
 
         // PUT: api/Orders
+        [Authorize(Policy = "Order-Manager-Policy")]
         [HttpPut]
         public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
         {
             try
             {
-                // Waiting for JWT
-
-                //var userID = orderDTO.UserID;
-
-                //if (!await _orderService.IsValidUser(userID)) // Check user authority
-                //{
-                //    return BadRequest("Invalid user or user doesn't have permission to access this feature!");
-                //}
 
                 if (!await _orderService.IsValidOrder(orderDTO.ID))
                 {

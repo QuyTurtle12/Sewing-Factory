@@ -15,13 +15,9 @@ namespace SewingFactory.Services.Interface
 
         Task<bool> IsValidOrder(Guid orderID);
 
-        Task<bool> AddOrder(AddOrderDTO dto);
+        Task<bool> AddOrder(AddOrderDTO dto, Guid userID);
 
         Task<bool> UpdateOrder(UpdateOrderDTO dto);
-
-        Task<bool> IsValidUserForAddOrderFeature(Guid userId);
-
-        Task<bool> IsValidUserForUpdateOrderFeature(Guid userId);
 
         bool IsValidStatusFormat(string? status);
 

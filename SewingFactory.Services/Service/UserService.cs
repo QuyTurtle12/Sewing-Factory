@@ -1,4 +1,5 @@
 using AutoMapper;
+using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
@@ -218,5 +219,6 @@ namespace SewingFactory.Services.Service
         {
             return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == userID) is not null;
         }
+
     }
 }
