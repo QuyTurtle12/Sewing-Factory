@@ -8,12 +8,12 @@ namespace SewingFactory.Services.Interface
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<Category>> GetCategoriesAsync(int pageNumber, int pageSize);
+        Task<IEnumerable<object>> GetCategoriesAsync(int pageNumber, int pageSize);
         Task<Category> GetCategoryByIdAsync(Guid id);
         Task<bool> CategoryExistsAsync(Guid id);
         Task<Category> CreateCategoryAsync(CategoryDTO categoryDTO);
         System.Threading.Tasks.Task UpdateCategoryAsync(Guid id, CategoryDTO categoryDTO);
         System.Threading.Tasks.Task DeleteCategoryAsync(Guid id);
-        Task<IEnumerable<Category>> SearchCategory(int pageNumber, int pageSize, string searchTerm);
+        Task<IEnumerable<object>> SearchCategory(int pageNumber, int pageSize, string searchTerm);
     }
 }

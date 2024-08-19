@@ -114,16 +114,16 @@ namespace SewingFactory
                     };
 
                     // Custom response for authorization failures
-                    //options.Events = new JwtBearerEvents
-                    //{
-                    //    OnForbidden = context =>
-                    //    {
-                    //        context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    //        context.Response.ContentType = "application/json";
-                    //        var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
-                    //        return context.Response.WriteAsync(result);
-                    //    }
-                    //};
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            context.Response.ContentType = "application/json";
+                            var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
+                            return context.Response.WriteAsync(result);
+                        }
+                    };
                 });
 
             // Configure authorization services

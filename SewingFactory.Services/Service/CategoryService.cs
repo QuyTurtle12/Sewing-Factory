@@ -18,10 +18,13 @@ namespace SewingFactory.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync(int pageNumber, int pageSize)
+        public async Task<IEnumerable<object>> GetCategoriesAsync(int pageNumber, int pageSize)
         {
-            return await _context.Categories.Skip((pageNumber - 1) * pageSize)
-                                            .Take(pageSize).ToListAsync();
+            return await _context.Categories
+                                 .Skip((pageNumber - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .Select(c => new { c.ID, c.Name })
+                                 .ToListAsync();
         }
 
         public async Task<Category> GetCategoryByIdAsync(Guid id)
@@ -90,7 +93,7 @@ namespace SewingFactory.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<Category>> SearchCategory(int pageNumber, int pageSize, string searchTerm)
+        public async Task<IEnumerable<object>> SearchCategory(int pageNumber, int pageSize, string searchTerm)
         {
             var query = _context.Categories.AsQueryable();
 
@@ -102,6 +105,7 @@ namespace SewingFactory.Services
             return await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
+                .Select(c => new { c.ID, c.Name })
                 .ToListAsync();
         }
     }

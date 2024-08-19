@@ -46,7 +46,7 @@ namespace SewingFactory.Controllers
                 return NotFound();
             }
 
-            return Ok(category);
+            return Ok(new { category.ID, category.Name});
         }
 
         [Authorize(Policy = "Product")]
@@ -69,7 +69,7 @@ namespace SewingFactory.Controllers
                 return NotFound();
             }
 
-            return Ok(category);
+            return Ok(new { category.ID, category.Name });
         }
 
         [Authorize(Policy = "Product")]
@@ -87,7 +87,7 @@ namespace SewingFactory.Controllers
                 return BadRequest(new { message = ex.Message });
             }
 
-            return Ok(newCategory);
+            return Ok(new { newCategory.ID, newCategory.Name });
         }
 
         [Authorize(Policy = "Product")]
@@ -100,7 +100,7 @@ namespace SewingFactory.Controllers
                 var category = await _categoryService.GetCategoryByIdAsync(id);
                 await _categoryService.DeleteCategoryAsync(id);
 
-                return Ok(category);
+                return Ok(new { category.ID, category.Name });
             }
             catch (KeyNotFoundException)
             {

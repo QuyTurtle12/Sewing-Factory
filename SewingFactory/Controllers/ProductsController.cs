@@ -15,10 +15,12 @@ namespace SewingFactory.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-        public ProductsController(IProductService productService)
+        public ProductsController(IProductService productService, ICategoryService categoryService)
         {
             _productService = productService;
+            _categoryService = categoryService;
         }
 
         [Authorize(Policy = "Product")]
@@ -91,7 +93,8 @@ namespace SewingFactory.Controllers
                 return NotFound(new { message = "Product not found." });
             }
 
-            return Ok();
+            var product = await _productService.GetProductAsync(id);
+            return Ok(product);
         }
 
         [Authorize(Policy = "Product")]
@@ -121,7 +124,8 @@ namespace SewingFactory.Controllers
             }
 
             var newProduct = await _productService.CreateProductAsync(productDTO);
-            return Ok(newProduct);
+            var category = await _categoryService.GetCategoryByIdAsync(newProduct.CategoryID);
+            return Ok(new {newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status});
         }
 
         [Authorize(Policy = "Product")]
@@ -129,13 +133,21 @@ namespace SewingFactory.Controllers
         [HttpPut("ChangeStatus/{id}")]
         public async Task<IActionResult> ChangeProductStatus(Guid id)
         {
-            var result = await _productService.ChangeProductStatusAsync(id);
-            if (!result)
+            try
             {
-                return NotFound(new { message = "Product not found." });
-            }
+                var result = await _productService.ChangeProductStatusAsync(id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Product not found." });
+                }
 
-            return NoContent();
+                var product = await _productService.GetProductAsync(id);
+                return Ok(product);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"{e.Message}");
+            }
         }
 
         [Authorize(Policy = "Product")]

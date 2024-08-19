@@ -70,11 +70,15 @@ namespace SewingFactory.Repositories.DBContext
                 .IsRequired();
 
             // Category - Product Relationship
+            //modelBuilder.Entity<Product>()
+            //    .HasOne<Category>()
+            //    .WithMany()
+            //    .HasForeignKey(p => p.CategoryID)
+            //    .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Product>()
-                .HasOne<Category>()
-                .WithMany()
-                .HasForeignKey(p => p.CategoryID)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasOne(c => c.Category)
+                .WithMany(p => p.Products)
+                .HasForeignKey(u => u.CategoryID);
 
             // Seed roles
             modelBuilder.Entity<Role>().HasData(
