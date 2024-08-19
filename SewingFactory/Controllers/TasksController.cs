@@ -31,11 +31,11 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "View task list of all groups"
         )]
-        public async Task<IActionResult> GetTasks(int page, int pageSize)
+        public async Task<IActionResult> GetTasks([Required] int pageNumber = 1, [Required] int pageSize = 10)
         {
             try
             {
-                return Ok(await _taskService.GetAllTasks(page, pageSize));
+                return Ok(await _taskService.GetAll(pageNumber, pageSize));
             }
             catch (Exception ex)
             {
@@ -51,11 +51,11 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "View a specific task"
         )]
-        public async Task<IActionResult> GetTask(Guid id)
+        public async Task<IActionResult> GetTask([Required] Guid id)
         {
             try
             {
-                return Ok(await _taskService.GetTaskById(id));
+                return Ok(await _taskService.GetById(id));
             }
             catch (Exception ex)
             {
@@ -70,12 +70,12 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager that created that task",
             Description = "Adjust corresponding order, task name, task description and deadline of the task"
         )]
-        public async Task<IActionResult> UpdateTaskInfo(Guid id, TaskUpdateDto dto)
+        public async Task<IActionResult> UpdateTaskInfo([Required] Guid id, TaskUpdateDto dto)
         {
             try
             {
                 // Call the service to update the task
-                return Ok(await _taskService.UpdateTaskInfo(id, GetUserID(), dto));
+                return Ok(await _taskService.UpdateInfo(id, GetUserID(), dto));
             }
             catch (KeyNotFoundException ex)
             {
@@ -94,11 +94,11 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Sewing Staff of that group",
             Description = "Update the current status (%) of the task"
         )]
-        public async Task<IActionResult> UpdateTaskStatus(Guid id, [Required] double? status)
+        public async Task<IActionResult> UpdateTaskStatus([Required] Guid id, [Required] double? status)
         {
             try
             {
-                return Ok(await _taskService.UpdateTaskStatus(id, GetUserID(), status));
+                return Ok(await _taskService.UpdateStatus(id, GetUserID(), status));
             }
             catch (KeyNotFoundException ex)
             {
@@ -125,7 +125,7 @@ namespace SewingFactory.Controllers
             {
 
 
-                var task = await _taskService.CreateTask(GetUserID(), dto);
+                var task = await _taskService.Create(GetUserID(), dto);
                 return CreatedAtAction(nameof(GetTask), new { id = task.ID }, task);
             }
             catch (Exception ex)
@@ -142,19 +142,152 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager that created that task",
             Description = "Delete the task if completed or neccessary"
         )]
-        public IActionResult DeleteTask(Guid id)
+        public IActionResult DeleteTask([Required] Guid id)
         {
             try
             {
-                _taskService.DeleteTask(id, GetUserID());
+                _taskService.Delete(id, GetUserID());
                 return Ok("Task deleted");
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"{ex.Message}");
             }
-
         }
+
+        // GET: api/Tasks/search/order
+        [HttpGet("search/order")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search tasks of an order"
+        )]
+        public async Task<IActionResult> SearchByOrderID([Required] Guid orderID, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByOrderID(orderID, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/name
+        [HttpGet("search/name")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search tasks list with the name query, the query is included in the task name"
+        )]
+        public async Task<IActionResult> SearchByName([Required] string searchQuery, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByName(searchQuery, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/status
+        [HttpGet("search/status")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search tasks list with the status, using min and max range to find (use the same values for both to find exactly)"
+        )]
+        public async Task<IActionResult> SearchByStatus([Required, Range(0, 1)] double min, [Required, Range(0, 1)] double max, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByStatus(min, max, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/creator
+        [HttpGet("search/creator")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search tasks of a creator"
+        )]
+        public async Task<IActionResult> SearchByCreatorID([Required] Guid creatorID, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByCreatorID(creatorID, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/created-date
+        [HttpGet("search/created-date")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search task list with the created date [yyyy-mm-dd], using the range to find tasks within (use the same values for both to find exactly)"
+        )]
+        public async Task<IActionResult> SearchByCreatedDate([Required] DateOnly startDate, [Required] DateOnly endDate, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByCreatedDate(startDate, endDate, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/deadline
+        [HttpGet("search/deadline")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search task list with the deadline [yyyy-mm-dd], using the range to find tasks within (use the same values for both to find exactly)"
+        )]
+        public async Task<IActionResult> SearchByDeadline([Required] DateOnly startDate, [Required] DateOnly endDate, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByDeadline(startDate, endDate, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
+        // GET: api/Tasks/search/group
+        [HttpGet("search/group")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "Search tasks list with the group name query, must be exact name"
+        )]
+        public async Task<IActionResult> SearchByGroupName([Required] string groupName, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(await _taskService.SearchByGroupName(groupName, pageNumber, pageSize));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+        }
+
 
         private Guid GetUserID()
         {
