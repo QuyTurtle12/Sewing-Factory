@@ -165,5 +165,41 @@ namespace SewingFactory.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Changes the password for a staff member.
+        /// </summary>
+        /// <param name="id">The ID of the user whose password is to be changed.</param>
+        /// <param name="request">The password change request data.</param>
+        /// <returns>ActionResult indicating success or failure of the password change.</returns>
+        [HttpPost("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordForStaffDto request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Password change data is null.");
+            }
+
+            try
+            {
+                var result = await _userService.ChangePasswordForStaff(id, request);
+
+                if (result.Success)
+                {
+                    return Ok(result.Message);
+                }
+
+                return BadRequest(result.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
     }
 }
