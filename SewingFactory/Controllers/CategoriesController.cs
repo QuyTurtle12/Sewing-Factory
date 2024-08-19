@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
 
