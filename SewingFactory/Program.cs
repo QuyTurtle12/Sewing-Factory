@@ -8,6 +8,7 @@ using SewingFactory.Services.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SewingFactory.Services.Interface;
 
 namespace SewingFactory
 {
