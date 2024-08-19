@@ -10,12 +10,19 @@ namespace SewingFactory.Models.Models
 
         public string? Name { get; set; }
 
-        public Role() { }
+        // Navigation property: one role can be associated with many users
+        public virtual ICollection<User> Users { get; set; }
+
+        public Role()
+        {
+            Users = new HashSet<User>();
+        }
 
         public Role(Guid id, string? name)
         {
             ID = id;
             Name = name;
+            Users = new HashSet<User>();
         }
     }
 }

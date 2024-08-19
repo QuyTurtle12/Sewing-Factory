@@ -6,16 +6,22 @@ namespace SewingFactory.Models.Models
     public class Group
     {
         [Key]
-        public Guid ID { get; set; } //primary key
+        public Guid ID { get; set; } // Primary key
         public string? Name { get; set; }
 
-        public Group() { }
+        // Navigation property: one group can be associated with many users
+        public virtual ICollection<User> Users { get; set; }
 
-        public Group(Guid id, string? Name)
+        public Group()
         {
-            ID = id;
-            this.Name = Name;
+            Users = new HashSet<User>();
         }
 
+        public Group(Guid id, string? name)
+        {
+            ID = id;
+            Name = name;
+            Users = new HashSet<User>();
+        }
     }
 }

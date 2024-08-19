@@ -22,7 +22,7 @@ namespace SewingFactory.Services.Service
             _context = context;
         }
 
-        public async Task<IEnumerable<object>> GetProductsAsync()
+        public async Task<IEnumerable<object>> GetProductsAsync(int pageNumber, int pageSize)
         {
             return await _context.Products
                 .Join(
@@ -37,6 +37,8 @@ namespace SewingFactory.Services.Service
                         product.Price,
                         product.Status
                     })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 

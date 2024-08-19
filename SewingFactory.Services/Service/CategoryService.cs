@@ -18,9 +18,10 @@ namespace SewingFactory.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Category>> GetCategoriesAsync()
+        public async Task<IEnumerable<Category>> GetCategoriesAsync(int pageNumber, int pageSize)
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories.Skip((pageNumber - 1) * pageSize)
+                                            .Take(pageSize).ToListAsync();
         }
 
         public async Task<Category> GetCategoryByIdAsync(Guid id)

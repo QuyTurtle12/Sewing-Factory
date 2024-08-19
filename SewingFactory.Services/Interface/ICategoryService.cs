@@ -8,7 +8,7 @@ namespace SewingFactory.Services.Interface
 {
     public interface ICategoryService
     {
-        Task<IEnumerable<Category>> GetCategoriesAsync();
+        Task<IEnumerable<Category>> GetCategoriesAsync(int pageNumber, int pageSize);
         Task<Category> GetCategoryByIdAsync(Guid id);
         Task<bool> CategoryExistsAsync(Guid id);
         Task<Category> CreateCategoryAsync(CategoryDTO categoryDTO);

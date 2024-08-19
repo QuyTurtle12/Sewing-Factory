@@ -21,12 +21,16 @@ namespace SewingFactory.Controllers
             _productService = productService;
         }
 
-        [Authorize(Policy = "Product-Manager-Policy")]
+        [Authorize(Policy = "Product")]
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetProducts(int pageNumber = 1, int pageSize = 10)
         {
-            var productsWithCategory = await _productService.GetProductsAsync();
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var productsWithCategory = await _productService.GetProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
@@ -51,7 +55,7 @@ namespace SewingFactory.Controllers
             return Ok(productWithCategory);
         }
 
-        [Authorize(Policy = "Product-Manager-Policy")]
+        [Authorize(Policy = "Product")]
         // PUT: api/Products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
@@ -86,7 +90,7 @@ namespace SewingFactory.Controllers
             return NoContent();
         }
 
-        [Authorize(Policy = "Product-Manager-Policy")]
+        [Authorize(Policy = "Product")]
         // POST: api/Products
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
@@ -116,7 +120,7 @@ namespace SewingFactory.Controllers
             return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
         }
 
-        [Authorize(Policy = "Product-Manager-Policy")]
+        [Authorize(Policy = "Product")]
         // PUT: api/Products/ChangeStatus/5
         [HttpPut("ChangeStatus/{id}")]
         public async Task<IActionResult> ChangeProductStatus(Guid id)

@@ -11,7 +11,7 @@ namespace SewingFactory.Services
 {
     public interface IProductService
     {
-        Task<IEnumerable<object>> GetProductsAsync();
+        Task<IEnumerable<object>> GetProductsAsync(int pageNumber, int pageSize);
         Task<IEnumerable<object>> GetAllExistProductsAsync();
         Task<ProductDetailsDTO> GetProductAsync(Guid id);
         Task<bool> UpdateProductAsync(Guid id, ProductDTO productDTO);

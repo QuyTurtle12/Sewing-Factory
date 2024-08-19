@@ -37,6 +37,7 @@ namespace SewingFactory
             // Register Services in Dependency Injection Container
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddControllers();
@@ -109,6 +110,18 @@ namespace SewingFactory
                         IssuerSigningKey = key,
                         ClockSkew = TimeSpan.Zero
                     };
+
+                    // Custom response for authorization failures
+                    //options.Events = new JwtBearerEvents
+                    //{
+                    //    OnForbidden = context =>
+                    //    {
+                    //        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    //        context.Response.ContentType = "application/json";
+                    //        var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
+                    //        return context.Response.WriteAsync(result);
+                    //    }
+                    //};
                 });
 
             // Load and configure authorization policies from appsettings.json
