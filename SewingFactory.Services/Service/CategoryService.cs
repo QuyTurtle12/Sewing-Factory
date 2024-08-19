@@ -89,5 +89,20 @@ namespace SewingFactory.Services
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Category>> SearchCategory(int pageNumber, int pageSize, string searchTerm)
+        {
+            var query = _context.Categories.AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(c => c.Name.ToUpper().Contains(searchTerm.ToUpper()));
+            }
+
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
     }
 }

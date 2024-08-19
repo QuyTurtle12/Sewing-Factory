@@ -35,9 +35,13 @@ namespace SewingFactory.Controllers
         }
 
         [HttpGet("GetAllExistProducts")]
-        public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts(int pageNumber = 1, int pageSize = 10)
         {
-            var productsWithCategory = await _productService.GetAllExistProductsAsync();
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var productsWithCategory = await _productService.GetAllExistProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
@@ -132,6 +136,22 @@ namespace SewingFactory.Controllers
             }
 
             return NoContent();
+        }
+
+        [Authorize(Policy = "Product")]
+        [HttpGet("searchProduct")]
+        public async Task<ActionResult<IEnumerable<ProductDetailsDTO>>> SearchProduct(int pageNumber = 1, int pageSize = 10, string searchByName = null, double lowestPrice = -1, double highestPrice = -1, string searchByCategoryName = null)
+        {
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var products = await _productService.SearchProduct(pageNumber, pageSize, searchByName, lowestPrice, highestPrice, searchByCategoryName);
+            if (products == null)
+            {
+                return NoContent();
+            }
+            return Ok(products);
         }
     }
 }

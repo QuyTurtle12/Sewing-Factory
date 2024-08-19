@@ -2,7 +2,6 @@
 using SewingFactory.Services.Interface;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models.Models;
-using SewingFactory.Repositories.DBContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -42,7 +41,7 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<object>> GetAllExistProductsAsync()
+        public async Task<IEnumerable<object>> GetAllExistProductsAsync(int pageNumber, int pageSize)
         {
             return await _context.Products
                 .Where(p => p.Status == true)
@@ -58,6 +57,8 @@ namespace SewingFactory.Services.Service
                         product.Price,
                         product.Status
                     })
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
         }
 
@@ -135,6 +136,58 @@ namespace SewingFactory.Services.Service
         public async Task<bool> CategoryExistsAsync(Guid id)
         {
             return await _context.Categories.AnyAsync(e => e.ID == id);
+        }
+
+        public async Task<IEnumerable<ProductDetailsDTO>> SearchProduct(
+                int pageNumber,
+                int pageSize,
+                string searchByName,
+                double lowestPrice,
+                double highestPrice,
+                string searchByCategoryName)
+        {
+            var query = _context.Products
+                .Join(
+                    _context.Categories,
+                    product => product.CategoryID,
+                    category => category.ID,
+                    (product, category) => new { product, category.Name }
+                )
+                .AsQueryable();
+
+            if (!string.IsNullOrEmpty(searchByName))
+            {
+                query = query.Where(p => p.product.Name.ToUpper().Contains(searchByName.ToUpper()));
+            }
+
+            // Search by price range
+            if (lowestPrice >= 0)
+            {
+                query = query.Where(p => p.product.Price >= lowestPrice);
+            }
+            if (highestPrice >= 0)
+            {
+                query = query.Where(p => p.product.Price <= highestPrice);
+            }
+
+            // Search by category name
+            if (!string.IsNullOrEmpty(searchByCategoryName))
+            {
+                query = query.Where(p => p.Name.ToUpper().Contains(searchByCategoryName.ToUpper()));
+            }
+
+            return await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new ProductDetailsDTO
+                {
+                    ID = p.product.ID,
+                    Name = p.product.Name,
+                    CategoryName = p.Name,
+                    Price = p.product.Price,
+                    Status = p.product.Status
+                })
+                .ToListAsync();
         }
     }
 }

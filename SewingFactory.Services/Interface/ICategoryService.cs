@@ -14,5 +14,6 @@ namespace SewingFactory.Services.Interface
         Task<Category> CreateCategoryAsync(CategoryDTO categoryDTO);
         System.Threading.Tasks.Task UpdateCategoryAsync(Guid id, CategoryDTO categoryDTO);
         System.Threading.Tasks.Task DeleteCategoryAsync(Guid id);
+        Task<IEnumerable<Category>> SearchCategory(int pageNumber, int pageSize, string searchTerm);
     }
 }

@@ -34,7 +34,8 @@ namespace SewingFactory.Controllers
         }
 
         // GET: api/Categories/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
+        [ActionName("GetCategoryById")]
         public async Task<ActionResult<Category>> GetCategory(Guid id)
         {
             var category = await _categoryService.GetCategoryByIdAsync(id);
@@ -101,6 +102,22 @@ namespace SewingFactory.Controllers
             }
 
             return NoContent();
+        }
+
+        [Authorize(Policy = "Product")]
+        [HttpGet("searchCategory")]
+        public async Task<ActionResult<IEnumerable<Category>>> SearchCategory(int pageNumber = 1, int pageSize = 10, string searchTerm = null)
+        {
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var categories = await _categoryService.SearchCategory(pageNumber, pageSize, searchTerm);
+            if(categories == null)
+            {
+                return NoContent();
+            }
+            return Ok(categories);
         }
     }
 }
