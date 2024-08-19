@@ -12,14 +12,14 @@ namespace SewingFactory.Services.Service
     public class UserService
     {
         private readonly DatabaseContext _dbContext;
-        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ValidationService _validationService;
 
         // Constructor for dependency injection
-        public UserService(DatabaseContext dbContext, IConfiguration configuration, IMapper mapper)
+        public UserService(DatabaseContext dbContext, ValidationService validation, IMapper mapper)
         {
             _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _validationService = validation ?? throw new ArgumentNullException(nameof(validation));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
@@ -35,6 +35,26 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
 
             return _mapper.Map<List<UserDto>>(users);
+        }
+
+        /// <summary>
+        /// Retrieves a paginated list of users from the database including their roles and groups.
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve.</param>
+        /// <param name="pageSize">The number of users per page.</param>
+        /// <returns>A paginated list of UserDto objects.</returns>
+        public async Task<(List<UserDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
+        {
+            var totalCount = await _dbContext.Users.CountAsync();
+
+            var users = await _dbContext.Users
+                .Include(u => u.Role)
+                .Include(u => u.Group)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (_mapper.Map<List<UserDto>>(users), totalCount);
         }
 
         /// <summary>
@@ -68,7 +88,7 @@ namespace SewingFactory.Services.Service
                 ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
 
             // Validate the request DTO
-            ValidateUpdateUserDto(id, request);
+            _validationService.ValidateUpdateUserDto(id, request);
 
             // Map properties from request DTO to user entity
             // Only update fields that are provided in the request
@@ -94,6 +114,7 @@ namespace SewingFactory.Services.Service
 
             if (!string.IsNullOrWhiteSpace(request.Password))
             {
+                _validationService.ValidatePassword(request.Password);
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
             }
 
@@ -119,7 +140,7 @@ namespace SewingFactory.Services.Service
             if (createUser == null) throw new ArgumentNullException(nameof(createUser));
 
             // Validate the request DTO
-            ValidateCreateUserDto(createUser);
+            _validationService.ValidateCreateUserDto(createUser);
 
             var user = _mapper.Map<User>(createUser);
             _dbContext.Users.Add(user);
@@ -153,6 +174,62 @@ namespace SewingFactory.Services.Service
             return userDto;
         }
 
+        public class ChangePasswordResult
+        {
+            public bool Success { get; set; }
+            public string? Message { get; set; }
+        }
+
+        public async Task<ChangePasswordResult> ChangePasswordForStaff(Guid id, ChangePasswordForStaffDto request)
+        {
+            if (request == null) throw new ArgumentNullException(nameof(request));
+
+            // Retrieve the user from the database
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.ID == id)
+                ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
+
+            // Validate the old password
+            if (!BCrypt.Net.BCrypt.Verify(request.OldPassword, user.Password))
+            {
+                return new ChangePasswordResult
+                {
+                    Success = false,
+                    Message = "Old password is incorrect."
+                };
+            }
+
+            // Validate the new password (additional checks if needed)
+            try
+            {
+                _validationService.ValidatePassword(request.NewPassword);
+            }
+            catch (ValidationException ex)
+            {
+                return new ChangePasswordResult
+                {
+                    Success = false,
+                    Message = ex.Message
+                };
+            }
+
+            // Update the password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+
+            // Save changes to the database
+            _dbContext.Users.Update(user);
+            await _dbContext.SaveChangesAsync();
+
+            // Return success result
+            return new ChangePasswordResult
+            {
+                Success = true,
+                Message = "Password changed successfully."
+            };
+        }
+
+
+
         /// <summary>
         /// Deletes a user based on the provided ID.
         /// </summary>
@@ -164,46 +241,8 @@ namespace SewingFactory.Services.Service
 
             _dbContext.Users.Remove(user);
             await _dbContext.SaveChangesAsync();
-        }
 
-        // Validate the creation DTO
-        private void ValidateCreateUserDto(CreateDto request)
-        {
-            var context = new ValidationContext(request);
-            var results = new List<ValidationResult>();
 
-            bool isValid = Validator.TryValidateObject(request, context, results, true);
-            if (!isValid)
-            {
-                var errorMessages = string.Join("; ", results.Select(r => r.ErrorMessage));
-                throw new ValidationException($"User validation failed: {errorMessages}");
-            }
-
-            // Additional custom validations
-            if (_dbContext.Users.Any(u => u.Username == request.Username))
-            {
-                throw new ValidationException($"Username '{request.Username}' is already taken.");
-            }
-        }
-
-        // Validate the update DTO
-        private void ValidateUpdateUserDto(Guid id, UpdateDto request)
-        {
-            var context = new ValidationContext(request);
-            var results = new List<ValidationResult>();
-
-            bool isValid = Validator.TryValidateObject(request, context, results, true);
-            if (!isValid)
-            {
-                var errorMessages = string.Join("; ", results.Select(r => r.ErrorMessage));
-                throw new ValidationException($"User validation failed: {errorMessages}");
-            }
-
-            // Additional custom validations
-            if (_dbContext.Users.Any(u => u.Username == request.Username && u.ID != id))
-            {
-                throw new ValidationException($"Username '{request.Username}' is already taken.");
-            }
         }
 
         // Accquire user name

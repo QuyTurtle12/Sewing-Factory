@@ -45,11 +45,11 @@ namespace SewingFactory.Controllers
 
         /// <summary>
         /// Retrieves a list of all users.
-        /// Requires the caller to have the Staff-Manager-Policy authorization.
+        /// <para>Requires the caller to have the Staff-Manager-Policy authorization.</para>
         /// </summary>
         /// <returns>ActionResult with a list of users or an error message.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
-        [HttpGet]
+        [HttpGet("listed")]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -63,6 +63,48 @@ namespace SewingFactory.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Retrieves a paginated list of users.
+        /// <para>This endpoint requires the "Staff-Manager-Policy" authorization policy.</para>
+        /// <para>Pagination parameters are provided in the query string, with default values of page number 1 and page size 10.</para>
+        /// <para>Returns a JSON object containing the total count of users, the current page number, the page size, and the list of users for the current page.</para>
+        /// </summary>
+        /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
+        /// <param name="pageSize">The number of users per page. Defaults to 10.</param>
+        /// <returns>An IActionResult containing the paginated user data, or an error message if the request is invalid or fails.</returns>
+        [Authorize(Policy = "Staff-Manager-Policy")]
+        [HttpGet("paged")]
+        public async Task<IActionResult> GetPagedUsers(int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                if (pageNumber < 1 || pageSize < 1)
+                {
+                    return BadRequest("Page number and page size must be greater than 0.");
+                }
+
+                var (users, totalCount) = await _userService.GetPagedUsersAsync(pageNumber, pageSize);
+
+                var result = new
+                {
+                    TotalCount = totalCount,
+                    PageNumber = pageNumber,
+                    PageSize = pageSize,
+                    Users = users
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
+
 
         /// <summary>
         /// Retrieves a user by their ID.
@@ -158,6 +200,42 @@ namespace SewingFactory.Controllers
             {
                 await _userService.DeleteUserAsync(id);
                 return Ok("User deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log the exception if needed
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Changes the password for a staff member.
+        /// </summary>
+        /// <param name="id">The ID of the user whose password is to be changed.</param>
+        /// <param name="request">The password change request data.</param>
+        /// <returns>ActionResult indicating success or failure of the password change.</returns>
+        [HttpPost("{id}/change-password")]
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordForStaffDto request)
+        {
+            if (request == null)
+            {
+                return BadRequest("Password change data is null.");
+            }
+
+            try
+            {
+                var result = await _userService.ChangePasswordForStaff(id, request);
+
+                if (result.Success)
+                {
+                    return Ok(result.Message);
+                }
+
+                return BadRequest(result.Message);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

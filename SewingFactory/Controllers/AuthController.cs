@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using SewingFactory.Services.Dto.UserDto.RequestDto;
 using SewingFactory.Services.Service;
@@ -80,4 +81,5 @@ namespace SewingFactory.Controllers
             }
         }
     }
+
 }
