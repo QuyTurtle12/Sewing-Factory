@@ -45,5 +45,11 @@ namespace SewingFactory.Services.Dto.UserDto.RequestDto
         /// </summary>
         [Range(0, double.MaxValue, ErrorMessage = "Salary must be a non-negative value.")]
         public double? Salary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the status of the user.
+        /// <para>This field is required and indicates if the user is active or not.</para>
+        /// </summary>
+        public bool? Status { get; set; }
     }
 }

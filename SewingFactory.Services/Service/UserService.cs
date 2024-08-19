@@ -1,6 +1,5 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Dto.UserDto.RequestDto;
@@ -42,8 +41,8 @@ namespace SewingFactory.Services.Service
         /// </summary>
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
-        /// <returns>A paginated list of UserDto objects.</returns>
-        public async Task<(List<UserDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
+        /// <returns>A tuple containing a paginated list of UserDto objects and the total count of users.</returns>
+        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
             var totalCount = await _dbContext.Users.CountAsync();
 
@@ -54,8 +53,9 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<List<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
         }
+
 
         /// <summary>
         /// Retrieves a user by their ID including their role and group.
@@ -123,6 +123,12 @@ namespace SewingFactory.Services.Service
                 user.Salary = request.Salary.Value;
             }
 
+            if (request.Status.HasValue)
+            {
+                user.Status = request.Status.Value;
+            }
+
+
             // Save changes to the database
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
@@ -141,6 +147,10 @@ namespace SewingFactory.Services.Service
 
             // Validate the request DTO
             _validationService.ValidateCreateUserDto(createUser);
+            if (!createUser.Status.HasValue)
+            {
+                createUser.Status = true;
+            }
 
             var user = _mapper.Map<User>(createUser);
             _dbContext.Users.Add(user);

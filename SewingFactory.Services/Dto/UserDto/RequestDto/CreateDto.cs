@@ -50,7 +50,6 @@ namespace SewingFactory.Services.Dto.UserDto.RequestDto
         /// Gets or sets the status of the user.
         /// <para>This field is required and indicates if the user is active or not.</para>
         /// </summary>
-        [Required]
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
     }
 }
