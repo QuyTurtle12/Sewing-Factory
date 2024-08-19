@@ -234,7 +234,7 @@ namespace SewingFactory.Services.Service
 
         public void DeleteTask(Guid id, Guid creatorID)
         {
-            var task = _dbContext.Tasks.Find(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");\
+            var task = _dbContext.Tasks.Find(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
             //Check if the creatorID matches with the creator ID in database
             if (creatorID != task.CreatorID) throw new UnauthorizedAccessException("Unauthorized action detected");
