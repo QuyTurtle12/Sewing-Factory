@@ -1,21 +1,21 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SewingFactory.Models
+namespace SewingFactory.Models.Models
 {
-    public class Role
+    public class Group
     {
         [Key]
-        public Guid ID { get; set; } // Primary key
-
+        public Guid ID { get; set; } //primary key
         public string? Name { get; set; }
 
-        public Role() { }
+        public Group() { }
 
-        public Role(Guid id, string? name)
+        public Group(Guid id, string? Name)
         {
             ID = id;
-            Name = name;
+            this.Name = Name;
         }
+
     }
 }

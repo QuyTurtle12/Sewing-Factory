@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SewingFactory.Models
+namespace SewingFactory.Models.Models
 {
     public class User
     {

@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models;
+using SewingFactory.Models.Models;
 
 namespace SewingFactory.Repositories.DBContext
 {
@@ -13,7 +13,7 @@ namespace SewingFactory.Repositories.DBContext
         public DbSet<Group> Groups { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Models.Task> Tasks { get; set; }
+        public DbSet<Models.Models.Task> Tasks { get; set; }
 
         // Mapping Configuration
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace SewingFactory.Repositories.DBContext
 
             // User - Task Relationship
             modelBuilder.Entity<User>()
-                .HasMany<Models.Task>()
+                .HasMany<Models.Models.Task>()
                 .WithOne()
                 .HasForeignKey(t => t.CreatorID)
                 .IsRequired()
@@ -53,13 +53,13 @@ namespace SewingFactory.Repositories.DBContext
 
             // Group - Task Relationship
             modelBuilder.Entity<Group>()
-                .HasMany<Models.Task>()
+                .HasMany<Models.Models.Task>()
                 .WithOne()
                 .HasForeignKey(t => t.GroupID)
                 .IsRequired();
 
             // Task - Order Relationship
-            modelBuilder.Entity<Models.Task>()
+            modelBuilder.Entity<Models.Models.Task>()
                 .HasOne<Order>()
                 .WithMany()
                 .HasForeignKey(t => t.OrderID)
