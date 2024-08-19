@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models.DTOs;
 using SewingFactory.Models.Models;
@@ -20,6 +21,7 @@ namespace SewingFactory.Controllers
             _productService = productService;
         }
 
+        [Authorize(Policy = "Product-Manager-Policy")]
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<object>>> GetProducts()
@@ -49,6 +51,7 @@ namespace SewingFactory.Controllers
             return Ok(productWithCategory);
         }
 
+        [Authorize(Policy = "Product-Manager-Policy")]
         // PUT: api/Products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
@@ -83,6 +86,7 @@ namespace SewingFactory.Controllers
             return NoContent();
         }
 
+        [Authorize(Policy = "Product-Manager-Policy")]
         // POST: api/Products
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
@@ -112,6 +116,7 @@ namespace SewingFactory.Controllers
             return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
         }
 
+        [Authorize(Policy = "Product-Manager-Policy")]
         // PUT: api/Products/ChangeStatus/5
         [HttpPut("ChangeStatus/{id}")]
         public async Task<IActionResult> ChangeProductStatus(Guid id)
