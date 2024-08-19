@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Models.DTOs;
+using SewingFactory.Models.DTO;
 using SewingFactory.Models.Models;
 using SewingFactory.Services.Interface;
 using System;

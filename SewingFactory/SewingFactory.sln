@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SewingFactory.Repository", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SewingFactory.Services", "..\SewingFactory.Services\SewingFactory.Services.csproj", "{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{E6759B64-EA8A-4540-A8B4-77C97E77A543}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SewingFactory.Core", "..\SewingFactory.Core\SewingFactory.Core.csproj", "{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,10 @@ Global
 		{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -48,6 +56,7 @@ Global
 		{516D497B-E4E1-4AA7-974C-3660E3034442} = {40EB5A8D-8ADF-4A6F-B7F1-8AD8B39A68DE}
 		{AE9F38A1-4A86-4631-816C-39104BE50372} = {FA39D288-D8E5-40D6-A62E-4A397DCEF696}
 		{EB08DEEC-A1D9-41C4-AAEE-731FC91615EA} = {40EB5A8D-8ADF-4A6F-B7F1-8AD8B39A68DE}
+		{1CD6C72A-1BF7-4A06-BC7A-77FADCE169E6} = {E6759B64-EA8A-4540-A8B4-77C97E77A543}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EB91BF58-DC95-45C0-9F9C-D7F40244E87F}

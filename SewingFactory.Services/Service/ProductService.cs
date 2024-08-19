@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.DTOs;
+﻿using SewingFactory.Repositories.DBContext;
+using SewingFactory.Services.Interface;
+using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models.Models;
 using SewingFactory.Repositories.DBContext;
 using System;
@@ -7,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SewingFactory.Models.DTO;
+
 
 namespace SewingFactory.Services.Service
 {
@@ -56,29 +59,36 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
         }
 
-        public async Task<object> GetProductAsync(Guid id)
+        public async Task<ProductDetailsDTO> GetProductAsync(Guid id)
         {
             return await _context.Products
                 .Join(
                     _context.Categories,
                     product => product.CategoryID,
                     category => category.ID,
-                    (product, category) => new
+                    (product, category) => new ProductDetailsDTO
                     {
-                        product.ID,
-                        product.Name,
+                        ID = product.ID,
+                        Name = product.Name,
                         CategoryName = category.Name,
-                        product.Price,
-                        product.Status
+                        Price = product.Price,
+                        Status = product.Status
                     })
                 .FirstOrDefaultAsync(p => p.ID == id);
+        }
+
+
+        public async Task<String> GetProductName(Guid id)
+        {
+            Product product = await _context.Products.FirstOrDefaultAsync(p => p.ID == id);
+            return product.Name;
         }
 
         public async Task<bool> UpdateProductAsync(Guid id, ProductDTO productDTO)
         {
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
-            {
+        {
                 return false;
             }
 

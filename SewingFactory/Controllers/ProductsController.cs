@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Models.DTOs;
+using SewingFactory.Models.DTO;
 using SewingFactory.Models.Models;
 using SewingFactory.Services;
 using SewingFactory.Services.Interface;

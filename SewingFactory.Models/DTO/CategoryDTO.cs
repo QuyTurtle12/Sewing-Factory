@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SewingFactory.Models.DTOs
+namespace SewingFactory.Models.DTO
 {
     public class CategoryDTO
     {

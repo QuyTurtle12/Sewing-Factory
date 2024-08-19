@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using SewingFactory.Models.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace SewingFactory.Models.Models
+namespace SewingFactory.Models
 {
     public class Task
     {
@@ -16,6 +17,10 @@ namespace SewingFactory.Models.Models
         public DateTime? CreatedDate { get; set; }
         public DateTime? Deadline { get; set; }
         public Guid GroupID { get; set; }
+
+        public virtual Order? Order { get; set; } // Navigation property, one task is based on one order
+        public virtual User? User { get; set; } // Navigation property, one task is created by one user
+        public virtual Group? Group { get; set; } // Navigation property, one task is assigned to one group
 
         public Task() { }
 

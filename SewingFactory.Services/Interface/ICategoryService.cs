@@ -1,4 +1,4 @@
-﻿using SewingFactory.Models.DTOs;
+﻿using SewingFactory.Models.DTO;
 using SewingFactory.Models.Models;
 using System;
 using System.Collections.Generic;

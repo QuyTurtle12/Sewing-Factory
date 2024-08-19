@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using SewingFactory.Models;
 using SewingFactory.Models.Models;
 
 namespace SewingFactory.Repositories.DBContext
@@ -13,7 +14,7 @@ namespace SewingFactory.Repositories.DBContext
         public DbSet<Group> Groups { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
-        public DbSet<Models.Models.Task> Tasks { get; set; }
+        public DbSet<Models.Task> Tasks { get; set; }
 
         // Mapping Configuration
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -22,7 +23,7 @@ namespace SewingFactory.Repositories.DBContext
 
             // User - Task Relationship
             modelBuilder.Entity<User>()
-                .HasMany<Models.Models.Task>()
+                .HasMany<Models.Task>()
                 .WithOne()
                 .HasForeignKey(t => t.CreatorID)
                 .IsRequired()
@@ -30,11 +31,9 @@ namespace SewingFactory.Repositories.DBContext
 
             // User - Role Relationship
             modelBuilder.Entity<User>()
-                .HasOne<Role>()
-                .WithMany()
-                .HasForeignKey(u => u.RoleID)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleID);
 
             // User - Orders Relationship
             modelBuilder.Entity<User>()
@@ -45,21 +44,19 @@ namespace SewingFactory.Repositories.DBContext
 
             // User - Group Relationship
             modelBuilder.Entity<User>()
-                .HasOne<Group>()
-                .WithMany()
-                .HasForeignKey(u => u.GroupID)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(u => u.Group)
+                .WithMany(g => g.Users)
+                .HasForeignKey(u => u.GroupID);
 
             // Group - Task Relationship
             modelBuilder.Entity<Group>()
-                .HasMany<Models.Models.Task>()
+                .HasMany<Models.Task>()
                 .WithOne()
                 .HasForeignKey(t => t.GroupID)
                 .IsRequired();
 
             // Task - Order Relationship
-            modelBuilder.Entity<Models.Models.Task>()
+            modelBuilder.Entity<Models.Task>()
                 .HasOne<Order>()
                 .WithMany()
                 .HasForeignKey(t => t.OrderID)
