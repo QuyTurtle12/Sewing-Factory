@@ -83,10 +83,12 @@ namespace SewingFactory.Services.Service
         }
 
         //Create task, status, created date and deadline excluded
-        public async Task<TaskResponseDto> CreateTask(TaskCreateDto dto)
+        public async Task<TaskResponseDto> CreateTask(Guid creatorID, TaskCreateDto dto)
         {
             var order = await _dbContext.Orders.FindAsync(dto.OrderID) ?? throw new KeyNotFoundException($"Order with order ID not found.");
-            var creator = await _dbContext.Users.FindAsync(dto.CreatorID) ?? throw new KeyNotFoundException($"User with creator ID not found.");
+            if (dto.GroupID == Guid.Empty) throw new KeyNotFoundException($"Group with group ID invalid.");
+            var group = await _dbContext.Groups.FindAsync(dto.GroupID) ?? throw new KeyNotFoundException($"Group with group ID not found.");
+            var creator = await _dbContext.Users.FindAsync(creatorID) ?? throw new KeyNotFoundException($"User with creator ID not found.");
 
             //Inject data from dto to Task object
             var task = new Task
@@ -96,10 +98,10 @@ namespace SewingFactory.Services.Service
                 Name = dto.Name,
                 Description = dto.Description,
                 Status = 0,
-                CreatorID = dto.CreatorID,
+                CreatorID = creatorID,
                 CreatedDate = DateTime.Now,
                 Deadline = DateTime.Now.AddDays(1),
-                GroupID = creator.GroupID,
+                GroupID = dto.GroupID,
             };
             _dbContext.Tasks.Add(task);
             await _dbContext.SaveChangesAsync();
@@ -128,11 +130,14 @@ namespace SewingFactory.Services.Service
             return taskResponseDto;
         }
 
-        public async Task<TaskResponseDto> UpdateTask(Guid id, TaskUpdateDto dto)
+        //Update task information, except status
+        public async Task<TaskResponseDto> UpdateTaskInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
         {
             //Find existing task
             var task = await _dbContext.Tasks.FindAsync(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
+            //Check if the creatorID matches with the creator ID in database
+            if (creatorID != task.CreatorID) throw new UnauthorizedAccessException("Unauthorized action detected");
 
             // Update properties
             if (dto.OrderID != Guid.Empty)
@@ -140,6 +145,7 @@ namespace SewingFactory.Services.Service
                 var order = await _dbContext.Orders.FindAsync(dto.OrderID) ?? throw new KeyNotFoundException($"Order with order ID not found.");
                 task.OrderID = dto.OrderID;
             }
+
             if (!string.IsNullOrWhiteSpace(dto.Name))
             {
                 task.Name = dto.Name;
@@ -147,14 +153,6 @@ namespace SewingFactory.Services.Service
             if (!string.IsNullOrWhiteSpace(dto.Description))
             {
                 task.Description = dto.Description;
-            }
-            if (dto.Status.HasValue)
-            {
-                if (dto.Status < 0 || dto.Status > 1) 
-                {
-                    throw new Exception("Task status must be in range 0 - 1");
-                }
-                task.Status = dto.Status;
             }
 
             if (dto.Deadline.HasValue)
@@ -189,12 +187,63 @@ namespace SewingFactory.Services.Service
 
         }
 
-        public void DeleteTask(Guid id)
+        //Update task status
+        public async Task<TaskResponseDto> UpdateTaskStatus(Guid id, Guid staffID, double? status)
         {
-            var task = _dbContext.Tasks.Find(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
+            //Find existing task
+            var task = await _dbContext.Tasks.Include(t => t.Group).FirstOrDefaultAsync(t => t.ID == id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
+
+            //Find the staff who is calling the method
+            var staff = await _dbContext.Users.FindAsync(staffID);
+
+            //Check if the staff is on the team as the task distributed into
+            if (staff?.GroupID != task.GroupID) throw new UnauthorizedAccessException("Unauthorized action detected");
+
+            if (status.HasValue)
+            {
+                if (status < 0 || status > 1) throw new Exception("Task status must be in range 0 - 1");
+
+                task.Status = status;
+            }
+            else throw new ArgumentNullException("Status input null");
+
+            await _dbContext.SaveChangesAsync();
+
+            //Retrieve again to gain the relationships
+            var getTask = await _dbContext.Tasks
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .FirstOrDefaultAsync(t => t.ID == task.ID);
+
+            var taskResponseDto = new TaskResponseDto
+            {
+                ID = getTask.ID,
+                OrderID = getTask.OrderID,
+                Name = getTask.Name,
+                Description = getTask.Description,
+                Status = getTask.Status,
+                CreatorName = getTask.User?.Name,
+                CreatedDate = getTask.CreatedDate,
+                Deadline = getTask.Deadline,
+                GroupName = getTask.Group?.Name
+            };
+
+            return taskResponseDto;
+        }
+
+        public void DeleteTask(Guid id, Guid creatorID)
+        {
+            var task = _dbContext.Tasks.Find(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");\
+
+            //Check if the creatorID matches with the creator ID in database
+            if (creatorID != task.CreatorID) throw new UnauthorizedAccessException("Unauthorized action detected");
+
             _dbContext.Tasks.Remove(task);
             _dbContext.SaveChanges();
         }
+
+
     }
 
 
