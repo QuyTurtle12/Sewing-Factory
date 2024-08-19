@@ -1,10 +1,8 @@
-﻿
-
-namespace SewingFactory.Models.DTO
+﻿namespace SewingFactory.Models.DTO
 {
     public class UpdateOrderDTO
     {
-        public Guid ID { get; set; } 
+        public Guid ID { get; set; }
 
         public string? Status { get; set; }
     }
