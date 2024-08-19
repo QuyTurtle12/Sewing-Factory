@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
@@ -7,7 +9,6 @@ using SewingFactory.Services.Dto.UserDto.RequestDto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SewingFactory.Services.Service
 {
@@ -42,9 +43,16 @@ namespace SewingFactory.Services.Service
                 throw new UnauthorizedAccessException("Invalid username or password.");
             }
 
+            // Check if the user's status is active
+            if (user.Status != true)
+            {
+                throw new UnauthorizedAccessException("User account is not active.");
+            }
+
             // Generate and return the JWT token
             return _tokenService.GenerateJwtToken(user);
         }
+
     }
 
     public interface ITokenService
@@ -80,6 +88,7 @@ namespace SewingFactory.Services.Service
             var roleName = user.Role?.Name ?? "DefaultRole";
             var groupName = user.Group?.Name ?? "DefaultGroup";
 
+
             // Create claims based on user information
             var claims = new List<Claim>
             {
@@ -87,6 +96,7 @@ namespace SewingFactory.Services.Service
                 new Claim("userId", user.ID.ToString()),
                 new Claim("roleName", roleName),
                 new Claim("groupName", groupName)
+
             };
 
             // Retrieve the token expiry period from configuration
@@ -165,4 +175,59 @@ namespace SewingFactory.Services.Service
             return Guid.Empty;
         }
     }
+
+    public class UserStatusRequirement : IAuthorizationRequirement
+    {
+        // No additional properties needed for a boolean status check
+    }
+
+    public class UserStatusHandler : AuthorizationHandler<UserStatusRequirement>
+    {
+        private readonly DatabaseContext _dbContext;
+        private readonly ITokenService _tokenService;
+        private readonly ILogger<UserStatusHandler> _logger;
+
+        public UserStatusHandler(DatabaseContext dbContext, ITokenService tokenService, ILogger<UserStatusHandler> logger)
+        {
+            _dbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
+            _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        protected override async System.Threading.Tasks.Task HandleRequirementAsync(AuthorizationHandlerContext context, UserStatusRequirement requirement)
+        {
+            if (context.User.Identity != null && context.User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = context.User.Claims.FirstOrDefault(c => c.Type == "userId");
+
+                if (userIdClaim != null && Guid.TryParse(userIdClaim.Value, out var userId))
+                {
+                    var user = await _dbContext.Users.FindAsync(userId);
+
+                    if (user != null && user.Status == true)
+                    {
+                        context.Succeed(requirement);
+                        return;
+                    }
+                    else
+                    {
+                        _logger.LogWarning($"Authorization failed for user {userId}: User status is not true.");
+                    }
+                }
+                else
+                {
+                    _logger.LogWarning($"Authorization failed: Invalid userId claim.");
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Authorization failed: User is not authenticated.");
+            }
+
+            context.Fail();
+        }
+    }
+
+
+
 }
