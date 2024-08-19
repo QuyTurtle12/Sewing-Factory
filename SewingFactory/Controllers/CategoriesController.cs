@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace SewingFactory.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
@@ -53,9 +54,11 @@ namespace SewingFactory.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(Guid id, CategoryDTO categoryDTO)
         {
+            Category category;
             try
             {
                 await _categoryService.UpdateCategoryAsync(id, categoryDTO);
+                category = await _categoryService.GetCategoryByIdAsync(id);
             }
             catch (ArgumentException ex)
             {
@@ -66,7 +69,7 @@ namespace SewingFactory.Controllers
                 return NotFound();
             }
 
-            return NoContent();
+            return Ok(category);
         }
 
         [Authorize(Policy = "Product")]
@@ -84,7 +87,7 @@ namespace SewingFactory.Controllers
                 return BadRequest(new { message = ex.Message });
             }
 
-            return CreatedAtAction("GetCategory", new { id = newCategory.ID }, newCategory);
+            return Ok(newCategory);
         }
 
         [Authorize(Policy = "Product")]
@@ -94,14 +97,15 @@ namespace SewingFactory.Controllers
         {
             try
             {
+                var category = await _categoryService.GetCategoryByIdAsync(id);
                 await _categoryService.DeleteCategoryAsync(id);
+
+                return Ok(category);
             }
             catch (KeyNotFoundException)
             {
                 return NotFound();
             }
-
-            return NoContent();
         }
 
         [Authorize(Policy = "Product")]

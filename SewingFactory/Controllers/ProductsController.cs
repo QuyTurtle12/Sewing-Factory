@@ -91,7 +91,7 @@ namespace SewingFactory.Controllers
                 return NotFound(new { message = "Product not found." });
             }
 
-            return NoContent();
+            return Ok();
         }
 
         [Authorize(Policy = "Product")]
@@ -121,7 +121,7 @@ namespace SewingFactory.Controllers
             }
 
             var newProduct = await _productService.CreateProductAsync(productDTO);
-            return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
+            return Ok(newProduct);
         }
 
         [Authorize(Policy = "Product")]
