@@ -214,11 +214,5 @@ namespace SewingFactory.Services.Service
             return user.Username;
         }
 
-        // Validate if user is existed in database
-        public async Task<bool> IsValidUser(Guid userID)
-        {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == userID) is not null;
-        }
-
     }
 }

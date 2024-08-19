@@ -152,6 +152,7 @@ namespace SewingFactory.Services.Service
             return null; // Null mean no error
         }
 
+        // Check if order is existed
         public async Task<bool> IsValidOrder(Guid orderID)
         {
             var order = await GetOrder(orderID);
@@ -162,6 +163,7 @@ namespace SewingFactory.Services.Service
             return true;
         }
 
+        // Check if status is correct format
         public bool IsValidStatusFormat(string? status)
         {
             if (string.IsNullOrWhiteSpace(status))
@@ -180,6 +182,364 @@ namespace SewingFactory.Services.Service
                 default:
                     return false;
             }
+        }
+
+        // Get a list of order by a specific filter
+        public async Task<IEnumerable<GetOrderDTO>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter)
+        {
+            try
+            {
+                IEnumerable<Order> orders = await GetOrderList();
+
+                // Modified variable
+                filter = filter.Trim().ToLower() ?? string.Empty;
+                firstInputValue = firstInputValue?.Trim() ?? null;
+                secondInputValue = secondInputValue?.Trim() ?? null;
+
+                // Create an empty list
+                IEnumerable<GetOrderDTO> result = new List<GetOrderDTO>();
+
+                // variable for using only one input
+                string? inputValue = string.Empty;
+
+                // Choosing the input that not null
+                if (!string.IsNullOrWhiteSpace(firstInputValue) || !string.IsNullOrWhiteSpace(secondInputValue))
+                {
+                    // If the first value not null then choose the first value else the second value
+                    inputValue = firstInputValue ?? secondInputValue;
+                }
+
+
+                switch (filter)
+                {
+                    case "status": // Search orders by status
+                        result = await StatusFilterAsync(inputValue, orders);
+                        break;
+                    case "cashier id": // Search orders by cashier id
+                        result = await CashierIDFilterAsync(inputValue, orders);
+                        break;
+                    case "customer phone": // Search orders by customer phone
+                        result = await CustomerPhoneFilterAsync(inputValue, orders);
+                        break;
+                    case "order date": // Search orders by order date
+                        result = await DateFilterAsync(firstInputValue, secondInputValue, filter, orders);
+                        break;
+                    case "finish date": // Search orders by finish date
+                        result = await DateFilterAsync(firstInputValue, secondInputValue, filter, orders);
+                        break;
+                    case "total amount": // Search orders by total amount
+                        result = await GetTotalAmountInRange(filter, orders, Double.Parse(firstInputValue), Double.Parse(secondInputValue));
+                        break;
+                    default:
+
+                        break;
+                }
+                var orderPaginationList = new PaginatedList<GetOrderDTO>(result, pageNumber, pageSize);
+
+                return orderPaginationList.GetPaginatedItems();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error :" + ex.Message);
+            }
+
+        }
+
+        // Get order list by status
+        private async Task<IEnumerable<GetOrderDTO>> StatusFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        {
+            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            switch (inputValue)
+            {
+                case "Not Started":
+                    foreach (Order order in orders)
+                    {
+                        // Check if order status is not null and equal to "Not Started"
+                        if (!(order.Status?.Equals(inputValue) ?? false))
+                        {
+                            continue; // Skip the whole code below and move to next iteration
+                        }
+                        // Transfer entity data to dto value that human understand
+                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        {
+                            OrderDate = DateTime.Now,
+                            FinishedDate = order.FinishedDate,
+                            CustomerName = order.CustomerName,
+                            CustomerPhone = order.CustomerPhone,
+                            Quantity = order.Quantity,
+                            TotalAmount = order.TotalAmount,
+                            Status = order.Status,
+                            CreatorName = await _userService.GetUserName(order.UserID),
+                            ProductName = await _productService.GetProductName(order.ProductID)
+
+                        };
+                        result.Add(orderDTO);
+                    }
+                    return result;
+                case "In Progress":
+                    foreach (Order order in orders)
+                    {
+                        // Check if order status is not null and equal to "In Progress"
+                        if (!(order.Status?.Equals(inputValue) ?? false))
+                        {
+                            continue; // Skip the whole code below and move to next iteration
+                        }
+
+                        // Transfer entity data to dto value that human understand
+                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        {
+                            OrderDate = DateTime.Now,
+                            FinishedDate = order.FinishedDate,
+                            CustomerName = order.CustomerName,
+                            CustomerPhone = order.CustomerPhone,
+                            Quantity = order.Quantity,
+                            TotalAmount = order.TotalAmount,
+                            Status = order.Status,
+                            CreatorName = await _userService.GetUserName(order.UserID),
+                            ProductName = await _productService.GetProductName(order.ProductID)
+
+                        };
+                        result.Add(orderDTO);
+                    }
+
+                    return result;
+                case "Done":
+                    foreach (Order order in orders)
+                    {
+                        // Check if order status is not null and equal to "Done"
+                        if (!(order.Status?.Equals(inputValue) ?? false))
+                        {
+                            continue; // Skip the whole code below and move to next iteration
+                        }
+
+                        // Transfer entity data to dto value that human understand
+                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        {
+                            OrderDate = DateTime.Now,
+                            FinishedDate = order.FinishedDate,
+                            CustomerName = order.CustomerName,
+                            CustomerPhone = order.CustomerPhone,
+                            Quantity = order.Quantity,
+                            TotalAmount = order.TotalAmount,
+                            Status = order.Status,
+                            CreatorName = await _userService.GetUserName(order.UserID),
+                            ProductName = await _productService.GetProductName(order.ProductID)
+
+                        };
+                        result.Add(orderDTO);
+                    }
+
+                    return result;
+                default:
+                    return new List<GetOrderDTO>(); // Return an empty list
+            }
+        }
+
+        // Get order list by cashier id
+        private async Task<IEnumerable<GetOrderDTO>> CashierIDFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        {
+            List<GetOrderDTO> result = new List<GetOrderDTO>();
+
+            foreach (Order order in orders)
+            {
+                // Check if input value can be parsed as a GUID and equal to order's user id
+                if (!Guid.TryParse(inputValue, out Guid inputGuid) || !order.UserID.Equals(inputGuid))
+                {
+                    continue; // Skip the whole code below and move to next iteration
+                }
+
+                // Transfer entity data to dto value that human understand
+                GetOrderDTO orderDTO = new GetOrderDTO()
+                {
+                    OrderDate = DateTime.Now,
+                    FinishedDate = order.FinishedDate,
+                    CustomerName = order.CustomerName,
+                    CustomerPhone = order.CustomerPhone,
+                    Quantity = order.Quantity,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatorName = await _userService.GetUserName(order.UserID),
+                    ProductName = await _productService.GetProductName(order.ProductID)
+
+                };
+                result.Add(orderDTO);
+            }
+
+            return result;
+        }
+
+        // Get order list by customer phone
+        private async Task<IEnumerable<GetOrderDTO>> CustomerPhoneFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        {
+            List<GetOrderDTO> result = new List<GetOrderDTO>();
+
+            foreach (Order order in orders)
+            {
+                // Check if customer phone is equal to input value (null also count as false)
+                // Phone Number Format: ###-####-### or ###-####-####
+                if (!(order.CustomerPhone?.Equals(inputValue)) ?? false)
+                {
+                    continue; // Skip the whole code below and move to next iteration
+                }
+
+                // Transfer entity data to dto value that human understand
+                GetOrderDTO orderDTO = new GetOrderDTO()
+                {
+                    OrderDate = DateTime.Now,
+                    FinishedDate = order.FinishedDate,
+                    CustomerName = order.CustomerName,
+                    CustomerPhone = order.CustomerPhone,
+                    Quantity = order.Quantity,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatorName = await _userService.GetUserName(order.UserID),
+                    ProductName = await _productService.GetProductName(order.ProductID)
+
+                };
+                result.Add(orderDTO);
+            }
+
+            return result;
+        }
+
+        // Get order list by date
+        private async Task<IEnumerable<GetOrderDTO>> DateFilterAsync(string? startDate, string? endDate, string filter, IEnumerable<Order> orders)
+        {
+            // Define the date format
+            string dateFormat = "dd/MM/yyyy";
+
+            // Parse the startDate and endDate
+            DateTime? startDateParsed = null;
+            DateTime? endDateParsed = null;
+
+            // Parse the startDate
+            if (!string.IsNullOrWhiteSpace(startDate))
+            {
+                if (DateTime.TryParseExact(startDate, dateFormat, null, System.Globalization.DateTimeStyles.None, out DateTime startDateValue))
+                {
+                    startDateParsed = startDateValue;
+                }
+                else
+                {
+                    // Handle invalid date format
+                    throw new ArgumentException("Invalid start date format. Please use " + nameof(dateFormat));
+                }
+            }
+
+            // Parse the endDate
+            if (!string.IsNullOrWhiteSpace(endDate))
+            {
+                if (DateTime.TryParseExact(endDate, dateFormat, null, System.Globalization.DateTimeStyles.None, out DateTime endDateValue))
+                {
+                    endDateParsed = endDateValue;
+                }
+                else
+                {
+                    // Handle invalid date format
+                    throw new ArgumentException("Invalid end date format. Please use " + nameof(dateFormat));
+                }
+            }
+
+            // Create an empty list
+            IEnumerable<GetOrderDTO> result = new List<GetOrderDTO>();
+
+            result = await GetDateInRange(filter, orders, startDateParsed, endDateParsed);
+
+            return result;
+        }
+
+        // Encapsulate get order list by date process
+        // Interact with database in here
+        private async Task<List<GetOrderDTO>> GetDateInRange(string filter, IEnumerable<Order> orders, DateTime? startDateParsed, DateTime? endDateParsed)
+        {
+            List<GetOrderDTO> result = new List<GetOrderDTO>();
+
+            foreach (Order order in orders)
+            {
+                // Determine which date to use for filtering
+                DateTime? dateToCheck = filter.Equals("order date")
+                    ? order.OrderDate
+                    : order.FinishedDate;
+
+                // If the date is not in range, skip the order
+                if (dateToCheck is null || !IsDateInRange(dateToCheck, startDateParsed, endDateParsed))
+                {
+                    continue;
+                }
+
+                // Transfer entity data to DTO
+                GetOrderDTO orderDTO = new GetOrderDTO
+                {
+                    OrderDate = order.OrderDate,
+                    FinishedDate = order.FinishedDate,
+                    CustomerName = order.CustomerName,
+                    CustomerPhone = order.CustomerPhone,
+                    Quantity = order.Quantity,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatorName = await _userService.GetUserName(order.UserID),
+                    ProductName = await _productService.GetProductName(order.ProductID)
+                };
+
+                result.Add(orderDTO);
+            }
+
+            return result;
+        }
+
+        // Check if a date is within the specified range
+        private bool IsDateInRange(DateTime? dateToCheck, DateTime? startDate, DateTime? endDate)
+        {
+            // Check if date is before start date or after end date
+            return !((startDate.HasValue && dateToCheck < startDate) ||
+                     (endDate.HasValue && dateToCheck > endDate));
+        }
+
+        // Get order list by total amount
+        private async Task<List<GetOrderDTO>> GetTotalAmountInRange(string filter, IEnumerable<Order> orders, double? minTotalAmount, double? maxTotalAmount)
+        {
+            // Create an empty list
+            List<GetOrderDTO> result = new List<GetOrderDTO>();
+
+            foreach (Order order in orders)
+            {
+                // Check if the salary is within the range
+                if (!IsAmountInRange(order.TotalAmount, minTotalAmount, maxTotalAmount))
+                {
+                    continue; // Skip this order and move to the next one
+                }
+
+                // Transfer entity data to DTO value
+                GetOrderDTO orderDTO = new GetOrderDTO()
+                {
+                    OrderDate = order.OrderDate,
+                    FinishedDate = order.FinishedDate,
+                    CustomerName = order.CustomerName,
+                    CustomerPhone = order.CustomerPhone,
+                    Quantity = order.Quantity,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatorName = await _userService.GetUserName(order.UserID),
+                    ProductName = await _productService.GetProductName(order.ProductID)
+                };
+
+                result.Add(orderDTO);
+            }
+
+            return result;
+        }
+
+        // Check if total amount is in given range
+        private bool IsAmountInRange(double? amountToCheck, double? minTotalAmount, double? maxTotalAmount)
+        {
+            // Check if amount is lower than min value or higher than max value
+            if ((minTotalAmount.HasValue && amountToCheck < minTotalAmount.Value) ||
+                (maxTotalAmount.HasValue && amountToCheck > maxTotalAmount.Value))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         // Update status to existed order

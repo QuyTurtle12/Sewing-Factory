@@ -22,5 +22,7 @@ namespace SewingFactory.Services.Interface
         bool IsValidStatusFormat(string? status);
 
         Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone);
+
+        Task<IEnumerable<GetOrderDTO>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter);
     }
 }

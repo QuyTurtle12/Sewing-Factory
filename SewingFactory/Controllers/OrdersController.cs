@@ -22,9 +22,10 @@ namespace SewingFactory.Controllers
 
         // GET: api/Orders
         // Get all orders
+        // Only Cashier or Order Manager can use
         [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders(int pageNumber, int pageSize)
+        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders(int pageNumber = 1, int pageSize = 5)
         {
             try
             {
@@ -40,6 +41,7 @@ namespace SewingFactory.Controllers
 
         // GET: api/Orders/{id}
         // Get 1 order by ID
+        // Only Cashier or Order Manager can use
         [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
         [Route("{id}")]
@@ -57,8 +59,27 @@ namespace SewingFactory.Controllers
             }
         }
 
+        // GET: api/Orders/search
+        // Search order list by a specific filter
+        // Only Cashier or Order Manager can use
+        [Authorize(Policy = "Cashier-Order")]
+        [HttpGet]
+        [Route("search")]
+        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> SearchOrderList(int pageNumber = 1, int pageSize = 5, string? firstInputValue = null, string? secondInputValue = null, string filter = "status")
+        {
+            try
+            {
+                return Ok(await _orderService.searchOrderDTOList(pageNumber, pageSize, firstInputValue, secondInputValue, filter));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // POST: api/Orders
         // Add an order to database
+        // Only Cashier can use
         [Authorize(Policy = "Cashier")]
         [HttpPost]
         public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
@@ -74,14 +95,14 @@ namespace SewingFactory.Controllers
                 }
 
                 var token = authorizationHeader.Substring("Bearer ".Length).Trim();
-                
+
                 var userID = _tokenService.GetUserIdFromTokenHeader(token);
 
-                if (userID == Guid.Empty) 
+                if (userID == Guid.Empty)
                 {
                     // Handle the case where the userId claim is not a valid Guid
-                    return BadRequest("Invalid user ID format."); 
-                }  
+                    return BadRequest("Invalid user ID format.");
+                }
 
                 orderDTO.CustomerName = orderDTO.CustomerName?.Trim();
 
@@ -111,6 +132,7 @@ namespace SewingFactory.Controllers
 
         // PUT: api/Orders
         // Update an order to database
+        // Only Order Manager can use
         [Authorize(Policy = "Order")]
         [HttpPut]
         public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
