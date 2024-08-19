@@ -1,4 +1,5 @@
 using AutoMapper;
+using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SewingFactory.Models;
@@ -123,6 +124,12 @@ namespace SewingFactory.Services.Service
                 user.Salary = request.Salary.Value;
             }
 
+            if (request.Status.HasValue)
+            {
+                user.Status = request.Status.Value;
+            }
+
+
             // Save changes to the database
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
@@ -141,6 +148,10 @@ namespace SewingFactory.Services.Service
 
             // Validate the request DTO
             _validationService.ValidateCreateUserDto(createUser);
+            if (!createUser.Status.HasValue)
+            {
+                createUser.Status = true;
+            }
 
             var user = _mapper.Map<User>(createUser);
             _dbContext.Users.Add(user);
