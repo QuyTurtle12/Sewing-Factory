@@ -45,6 +45,9 @@ namespace SewingFactory
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sewing Factory API", Version = "v1" });
+                
+                //Enable annotations
+                c.EnableAnnotations();
 
                 // Add Bearer token support to Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -120,8 +123,10 @@ namespace SewingFactory
                 {
                     foreach (var policy in policies)
                     {
+                        // Create a policy with multiple roles
                         options.AddPolicy(policy.Key, policyBuilder =>
-                            policyBuilder.RequireClaim("roleName", policy.Value));
+                        policyBuilder.RequireAssertion(context =>
+                        context.User.HasClaim(c => c.Type == "roleName" && policy.Value.Contains(c.Value))));
                     }
                 });
             }
