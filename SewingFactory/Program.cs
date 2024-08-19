@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SewingFactory.Services;
 
+
 namespace SewingFactory
 {
     public class Program
@@ -55,8 +56,7 @@ namespace SewingFactory
                     Type = SecuritySchemeType.Http,
                     Scheme = "bearer",
                     BearerFormat = "JWT",
-                    In = ParameterLocation.Header,
-                    Description = "Enter 'Bearer' [space] and then your token in the text input below.\r\nExample: \"Bearer abcdef12345\""
+                    In = ParameterLocation.Header
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -81,6 +81,7 @@ namespace SewingFactory
 
 
             builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ValidationService>();
             builder.Services.AddScoped<AuthService>();
             builder.Services.AddScoped<TaskService>();
             builder.Services.AddSingleton<ITokenService, TokenService>();
@@ -124,25 +125,37 @@ namespace SewingFactory
                     //};
                 });
 
-            // Load and configure authorization policies from appsettings.json
-            var policiesSection = builder.Configuration.GetSection("AuthorizationPolicies");
-            var policies = policiesSection.Get<Dictionary<string, string[]>>();
-
-            if (policies != null)
+            // Configure authorization services
+            builder.Services.AddAuthorization(options =>
             {
-                builder.Services.AddAuthorization(options =>
+                var policiesSection = builder.Configuration.GetSection("AuthorizationPolicies");
+                var policies = policiesSection.Get<Dictionary<string, string[]>>();
+
+                if (policies != null)
                 {
                     foreach (var policy in policies)
                     {
                         options.AddPolicy(policy.Key, policyBuilder =>
-                            policyBuilder.RequireClaim("roleName", policy.Value));
+                        {
+                            // Add role-based claims requirement
+                            policyBuilder.RequireClaim("roleName", policy.Value);
+
+                            // Add custom requirement
+                            policyBuilder.Requirements.Add(new UserStatusRequirement());
+                        });
                     }
-                });
-            }
-            else
-            {
-                throw new InvalidOperationException("Authorization policies not configured correctly in appsettings.json.");
-            }
+                }
+                else
+                {
+                    throw new InvalidOperationException("Authorization policies not configured correctly in appsettings.json.");
+                }
+            });
+
+            // Register the authorization handler as scoped
+            builder.Services.AddScoped<IAuthorizationHandler, UserStatusHandler>();
+
+
+
 
             var app = builder.Build();
 

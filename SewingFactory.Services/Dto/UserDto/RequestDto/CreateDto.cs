@@ -29,14 +29,14 @@ namespace SewingFactory.Services.Dto.UserDto.RequestDto
         /// Gets or sets the username of the user.
         /// <para>This field is required and must be between 5 and 50 characters long.</para>
         /// </summary>
-        [StringLength(50, MinimumLength = 5)]
+        [StringLength(50, MinimumLength = 5, ErrorMessage = "Username must be between 5 and 50 characters.")]
         public required string Username { get; set; }
 
         /// <summary>
         /// Gets or sets the password of the user.
         /// <para>This field is required and must be between 6 and 100 characters long.</para>
         /// </summary>
-        [StringLength(100, MinimumLength = 6)]
+        [StringLength(20, MinimumLength = 6, ErrorMessage = "Password must be between 6 and 20 characters.")]
         public required string Password { get; set; }
 
         /// <summary>
@@ -50,7 +50,6 @@ namespace SewingFactory.Services.Dto.UserDto.RequestDto
         /// Gets or sets the status of the user.
         /// <para>This field is required and indicates if the user is active or not.</para>
         /// </summary>
-        [Required]
-        public bool Status { get; set; }
+        public bool? Status { get; set; }
     }
 }
