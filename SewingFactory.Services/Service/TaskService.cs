@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Task = SewingFactory.Models.Task;
+using Microsoft.AspNetCore.Server.IIS.Core;
 
 
 namespace SewingFactory.Services.Service
@@ -27,7 +28,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Get all tasks
-        public async Task<IEnumerable<TaskResponseDto>> GetAllTasks(int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskResponseDto>> GetAll(int pageNumber, int pageSize)
         {
             var tasks = await _dbContext.Tasks
                 .Include(t => t.Order)
@@ -56,7 +57,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Get task by id
-        public async Task<TaskResponseDto> GetTaskById(Guid id)
+        public async Task<TaskResponseDto> GetById(Guid id)
         {
             var task = await _dbContext.Tasks
                 .Include(t => t.Order)
@@ -83,7 +84,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Create task, status, created date and deadline excluded
-        public async Task<TaskResponseDto> CreateTask(Guid creatorID, TaskCreateDto dto)
+        public async Task<TaskResponseDto> Create(Guid creatorID, TaskCreateDto dto)
         {
             var order = await _dbContext.Orders.FindAsync(dto.OrderID) ?? throw new KeyNotFoundException($"Order with order ID not found.");
             if (dto.GroupID == Guid.Empty) throw new KeyNotFoundException($"Group with group ID invalid.");
@@ -131,7 +132,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Update task information, except status
-        public async Task<TaskResponseDto> UpdateTaskInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
+        public async Task<TaskResponseDto> UpdateInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
         {
             //Find existing task
             var task = await _dbContext.Tasks.FindAsync(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
@@ -188,7 +189,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Update task status
-        public async Task<TaskResponseDto> UpdateTaskStatus(Guid id, Guid staffID, double? status)
+        public async Task<TaskResponseDto> UpdateStatus(Guid id, Guid staffID, double? status)
         {
             //Find existing task
             var task = await _dbContext.Tasks.Include(t => t.Group).FirstOrDefaultAsync(t => t.ID == id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
@@ -232,7 +233,7 @@ namespace SewingFactory.Services.Service
             return taskResponseDto;
         }
 
-        public void DeleteTask(Guid id, Guid creatorID)
+        public void Delete(Guid id, Guid creatorID)
         {
             var task = _dbContext.Tasks.Find(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
@@ -241,6 +242,255 @@ namespace SewingFactory.Services.Service
 
             _dbContext.Tasks.Remove(task);
             _dbContext.SaveChanges();
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByOrderID(Guid orderID, int pageNumber, int pageSize)
+        {
+            var order = await _dbContext.Orders.FindAsync(orderID) ?? throw new KeyNotFoundException($"Order with ID '{orderID}' not found.");
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.OrderID == orderID)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByName(string? searchQuery, int pageNumber, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(searchQuery)) throw new ArgumentNullException("Search query null");
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.Name.ToLower().Trim().Contains(searchQuery.ToLower().Trim()))
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByStatus(double min, double max, int pageNumber, int pageSize)
+        {
+            if (min > max) throw new Exception("Min value is higher than max value");
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.Status >= min && t.Status <= max)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatorID(Guid creatorID, int pageNumber, int pageSize)
+        {
+            var user = await _dbContext.Users.FindAsync(creatorID) ?? throw new KeyNotFoundException($"Creator with ID '{creatorID}' not found.");
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.CreatorID == creatorID)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatedDate(DateOnly min, DateOnly max, int pageNumber, int pageSize)
+        {
+            if (min > max) throw new Exception("Start date should not be later than end date");
+
+            DateTime startDate = min.ToDateTime(TimeOnly.MinValue);
+            DateTime endDate = max.ToDateTime(TimeOnly.MaxValue);
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.CreatedDate >=  startDate && t.CreatedDate <= endDate)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByDeadline(DateOnly min, DateOnly max, int pageNumber, int pageSize)
+        {
+            if (min > max) throw new Exception("Start date should not be later than end date");
+
+            DateTime startDate = min.ToDateTime(TimeOnly.MinValue);
+            DateTime endDate = max.ToDateTime(TimeOnly.MaxValue);
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.Deadline >= startDate && t.CreatedDate <= endDate)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+
+        }
+
+        public async Task<IEnumerable<TaskResponseDto>> SearchByGroupName(string? groupName, int pageNumber, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(groupName)) throw new ArgumentNullException("Search query null");
+
+            var group = await _dbContext.Groups.Where(g => g.Name.ToLower().Trim() == groupName.ToLower().Trim()).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Group not found");
+
+            if (group.ID == Guid.Empty) throw new KeyNotFoundException($"Group invalid.");
+
+
+            var tasks = await _dbContext.Tasks
+                .Where(t => t.GroupID == group.ID)
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
         }
 
 
