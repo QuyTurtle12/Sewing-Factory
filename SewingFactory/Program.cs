@@ -29,16 +29,17 @@ namespace SewingFactory
             // Register Services in Dependency Injection Container
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ValidationService>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<TaskService>();
+            builder.Services.AddSingleton<ITokenService, TokenService>();
 
             builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
                 policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
-            // Add services to the container.
-            // Register Services in Dependency Injection Container
-            builder.Services.AddScoped<IOrderService, OrderService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<IRoleService, RoleService>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
@@ -47,6 +48,9 @@ namespace SewingFactory
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sewing Factory API", Version = "v1" });
+                
+                //Enable annotations
+                c.EnableAnnotations();
 
                 // Add Bearer token support to Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -79,12 +83,6 @@ namespace SewingFactory
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<ValidationService>();
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<TaskService>();
-            builder.Services.AddSingleton<ITokenService, TokenService>();
-
             // Configure AutoMapper
             var mapperConfig = new MapperConfiguration(mc =>
             {
@@ -111,7 +109,10 @@ namespace SewingFactory
                         ClockSkew = TimeSpan.Zero
                     };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
                     // Custom response for authorization failures
                     options.Events = new JwtBearerEvents
                     {
@@ -121,6 +122,7 @@ namespace SewingFactory
                             context.Response.ContentType = "application/json";
                             var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
                             return context.Response.WriteAsync(result);
+<<<<<<< HEAD
                         },
 
                         OnChallenge = context =>
@@ -130,6 +132,8 @@ namespace SewingFactory
                             var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Authentication is required to access this resource." });
                             context.HandleResponse(); // Prevents the default challenge response
                             return context.Response.WriteAsync(result);
+=======
+>>>>>>> main
                         }
                     };
                 });
@@ -144,10 +148,13 @@ namespace SewingFactory
                 {
                     foreach (var policy in policies)
                     {
+                        // Create a policy with multiple roles
                         options.AddPolicy(policy.Key, policyBuilder =>
                         {
                             // Add role-based claims requirement
-                            policyBuilder.RequireClaim("roleName", policy.Value);
+                            policyBuilder.RequireAssertion(context =>
+                                context.User.Claims.Any(c =>
+                                    c.Type == "roleName" && policy.Value.Contains(c.Value, StringComparer.OrdinalIgnoreCase)));
 
                             // Add custom requirement
                             policyBuilder.Requirements.Add(new UserStatusRequirement());
@@ -160,48 +167,47 @@ namespace SewingFactory
                 }
             });
 
+
             // Register the authorization handler as scoped
             builder.Services.AddScoped<IAuthorizationHandler, UserStatusHandler>();
 
-
-
-
             var app = builder.Build();
 
-            // Apply pending migrations and seed the database
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                dbContext.Database.Migrate(); // Applies pending migrations
-            }
-
-            // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c =>
+                // Apply pending migrations and seed the database
+                using (var scope = app.Services.CreateScope())
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sewing Factory API V1");
-                    c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-                });
+                    var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                    dbContext.Database.Migrate(); // Applies pending migrations
+                }
+
+                // Configure the HTTP request pipeline.
+                if (app.Environment.IsDevelopment())
+                {
+                    app.UseDeveloperExceptionPage();
+                    app.UseSwagger();
+                    app.UseSwaggerUI(c =>
+                    {
+                        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sewing Factory API V1");
+                        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+                    });
+                }
+                else
+                {
+                    app.UseExceptionHandler("/Home/Error");
+                    app.UseHsts();
+                }
+
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
+                app.UseRouting();
+
+                app.UseCors();
+                app.UseAuthentication();
+                app.UseAuthorization();
+                app.MapControllers();
+
+                app.Run();
             }
-            else
-            {
-                app.UseExceptionHandler("/Home/Error");
-                app.UseHsts();
-            }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
-
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.MapControllers();
-
-            app.Run();
         }
     }
-}

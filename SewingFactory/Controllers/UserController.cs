@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
 using SewingFactory.Services.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -24,7 +24,7 @@ namespace SewingFactory.Controllers
         /// </summary>
         /// <param name="request">The user creation request data.</param>
         /// <returns>ActionResult indicating success or failure.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPost]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -53,7 +53,7 @@ namespace SewingFactory.Controllers
         /// <para>Requires the caller to have the Staff-Manager-Policy authorization.</para>
         /// </summary>
         /// <returns>ActionResult with a list of users or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("listed")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -88,7 +88,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A paginated list of UserDto objects and the total count of users.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("search")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -136,7 +136,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve. Defaults to 1.</param>
         /// <param name="pageSize">The number of users per page. Defaults to 10.</param>
         /// <returns>An IActionResult containing the paginated user data, or an error message if the request is invalid or fails.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("paged")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -184,7 +184,7 @@ namespace SewingFactory.Controllers
         /// </summary>
         /// <param name="id">The ID of the user to retrieve.</param>
         /// <returns>ActionResult with the user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet]
         [Route("{id:guid}")]
         [SwaggerOperation(
@@ -212,7 +212,7 @@ namespace SewingFactory.Controllers
         /// <param name="id">The ID of the user to update.</param>
         /// <param name="request">The update request data.</param>
         /// <returns>ActionResult with the updated user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPut]
         [Route("{id:guid}")]
         [SwaggerOperation(
@@ -240,7 +240,7 @@ namespace SewingFactory.Controllers
         /// <param name="id">The ID of the user whose status is to be updated.</param>
         /// <param name="statusDto">The status update request data.</param>
         /// <returns>ActionResult with the updated user details or an error message.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpPatch("{id}/status")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -340,7 +340,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A paginated list of users and the total count of users.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("search/role-group-id")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -380,7 +380,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param="pageSize">The number of users per page.</param>
         /// <returns>A paginated list of users and the total count of users.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("search/role-group-name")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -418,7 +418,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A paginated list of users and the total count of users.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("search/name")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",
@@ -456,7 +456,7 @@ namespace SewingFactory.Controllers
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A paginated list of users and the total count of users.</returns>
-        [Authorize(Policy = "Staff-Manager-Policy")]
+        [Authorize(Policy = "Staff")]
         [HttpGet("search/status")]
         [SwaggerOperation(
             Summary = "Authorization: Staff Manager",

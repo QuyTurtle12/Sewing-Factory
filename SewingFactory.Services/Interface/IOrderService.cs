@@ -1,5 +1,5 @@
 ﻿using SewingFactory.Models;
-using SewingFactory.Models.DTO;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Interface
 {
@@ -11,20 +11,20 @@ namespace SewingFactory.Services.Interface
 
         Task<GetOrderDTO> GetOrderDTO(Guid orderID);
 
+        Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize);
+
         Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList();
 
         Task<bool> IsValidOrder(Guid orderID);
 
-        Task<bool> AddOrder(AddOrderDTO dto);
+        Task<bool> AddOrder(AddOrderDTO dto, Guid userID);
 
         Task<bool> UpdateOrder(UpdateOrderDTO dto);
-
-        Task<bool> IsValidUserForAddOrderFeature(Guid userId);
-
-        Task<bool> IsValidUserForUpdateOrderFeature(Guid userId);
 
         bool IsValidStatusFormat(string? status);
 
         Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone);
+
+        Task<IEnumerable<GetOrderDTO>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 
-namespace SewingFactory.Services.Dto.UserDto.RequestDto
+namespace SewingFactory.Services.DTOs.UserDto.RequestDto
 {
     public class ChangePasswordForStaffDto
     {
