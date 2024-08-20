@@ -110,8 +110,7 @@ namespace SewingFactory
                         IssuerSigningKey = key,
                         ClockSkew = TimeSpan.Zero
                     };
-<<<<<<< Updated upstream
-=======
+
 
                     // Custom response for authorization failures
                     options.Events = new JwtBearerEvents
@@ -133,7 +132,6 @@ namespace SewingFactory
                             return context.Response.WriteAsync(result);
                         }
                     };
->>>>>>> Stashed changes
                 });
 
             // Configure authorization services
