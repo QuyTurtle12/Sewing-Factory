@@ -298,7 +298,7 @@ namespace SewingFactory.Controllers
         /// <param name="id">The ID of the user whose password is to be changed.</param>
         /// <param name="request">The password change request data.</param>
         /// <returns>ActionResult indicating success or failure of the password change.</returns>
-        [HttpPost("{id}/change-password")]
+        [HttpPatch("{id}/change-password")]
         [SwaggerOperation(
             Description = "change password"
         )]
