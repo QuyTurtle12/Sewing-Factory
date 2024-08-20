@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
+using SewingFactory.Models.Models;
+using SewingFactory.Services;
 using SewingFactory.Services.Interface;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SewingFactory.Controllers
 {
@@ -25,140 +27,160 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Product")]
         // GET: api/Products
         [HttpGet]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Get all products in pages, pageSize = -1 to get all products."
+        )]
         public async Task<ActionResult<IEnumerable<object>>> GetProducts(int pageNumber = 1, int pageSize = 10)
         {
-            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            if (pageSize == -1)
             {
-                return BadRequest("pageNumber must be between 1 and " + pageSize);
+                pageNumber = 0;
             }
+            else if (pageNumber < 1)
+            {
+                return BadRequest("PageNumber must be greater than 0.");
+            }
+
             var productsWithCategory = await _productService.GetProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
         [HttpGet("GetAllExistProducts")]
+        [SwaggerOperation(
+            Summary = "Authorization: Anyone",
+            Description = "Get all products with status = true in pages."
+        )]
         public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts(int pageNumber = 1, int pageSize = 10)
         {
-            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            if (pageNumber < 1)
             {
-                return BadRequest("pageNumber must be between 1 and " + pageSize);
+                return BadRequest("PageNumber must be greater than 0.");
             }
+
             var productsWithCategory = await _productService.GetAllExistProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<object>> GetProduct(Guid id)
+        [SwaggerOperation(
+            Summary = "Authorization: Anyone",
+            Description = "Get product by ID."
+        )]
+        public async Task<ActionResult<ProductDetailsDTO>> GetProduct(Guid id)
         {
-            var productWithCategory = await _productService.GetProductAsync(id);
-
-            if (productWithCategory == null)
+            try
             {
-                return NotFound(new { message = "Product not found." });
+                var productWithCategory = await _productService.GetProductAsync(id);
+                return Ok(productWithCategory);
             }
-
-            return Ok(productWithCategory);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
         }
 
         [Authorize(Policy = "Product")]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Update an existing product by ID."
+        )]
         // PUT: api/Products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
         {
-            if (string.IsNullOrWhiteSpace(productDTO.Name))
+            try
             {
-                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
-            }
-
-            if (productDTO.CategoryID == Guid.Empty)
-            {
-                return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
-            }
-
-            if (productDTO.Price <= 0)
-            {
-                return BadRequest(new { message = "Price must be greater than 0." });
-            }
-
-            var categoryExists = await _productService.CategoryExistsAsync(productDTO.CategoryID);
-            if (!categoryExists)
-            {
-                return NotFound(new { message = "Category not found." });
-            }
-
-            var result = await _productService.UpdateProductAsync(id, productDTO);
-            if (!result)
-            {
+                var result = await _productService.UpdateProductAsync(id, productDTO);
+                if (result)
+                {
+                    var updatedProduct = await _productService.GetProductAsync(id);
+                    return Ok(updatedProduct);
+                }
                 return NotFound(new { message = "Product not found." });
             }
-
-            var product = await _productService.GetProductAsync(id);
-            return Ok(product);
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         [Authorize(Policy = "Product")]
         // POST: api/Products
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Create a new product."
+        )]
         public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
         {
-            if (string.IsNullOrWhiteSpace(productDTO.Name))
+            try
             {
-                return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
+                var newProduct = await _productService.CreateProductAsync(productDTO);
+                var category = await _categoryService.GetCategoryByIdAsync(newProduct.CategoryID);
+                return Ok(new { newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status });
             }
-
-            if (productDTO.CategoryID == Guid.Empty)
+            catch (KeyNotFoundException ex)
             {
-                return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
+                return NotFound(new { message = ex.Message });
             }
-
-            if (productDTO.Price <= 0)
+            catch (ArgumentException ex)
             {
-                return BadRequest(new { message = "Price must be greater than 0." });
+                return BadRequest(new { message = ex.Message });
             }
-
-            var categoryExists = await _productService.CategoryExistsAsync(productDTO.CategoryID);
-            if (!categoryExists)
-            {
-                return NotFound(new { message = "Category not found." });
-            }
-
-            var newProduct = await _productService.CreateProductAsync(productDTO);
-            var category = await _categoryService.GetCategoryByIdAsync(newProduct.CategoryID);
-            return Ok(new { newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status });
         }
 
         [Authorize(Policy = "Product")]
         // PUT: api/Products/ChangeStatus/5
         [HttpPut("ChangeStatus/{id}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Change the status of a product by ID."
+        )]
         public async Task<IActionResult> ChangeProductStatus(Guid id)
         {
             try
             {
                 var result = await _productService.ChangeProductStatusAsync(id);
-                if (!result)
+                if (result)
                 {
-                    return NotFound(new { message = "Product not found." });
+                    var updatedProduct = await _productService.GetProductAsync(id);
+                    return Ok(updatedProduct);
                 }
-
-                var product = await _productService.GetProductAsync(id);
-                return Ok(product);
+                return NotFound(new { message = "Product not found." });
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return StatusCode(500, $"{e.Message}");
+                return StatusCode(500, new { message = ex.Message });
             }
         }
 
         [Authorize(Policy = "Product")]
         [HttpGet("searchProduct")]
-        public async Task<ActionResult<IEnumerable<ProductDetailsDTO>>> SearchProduct(int pageNumber = 1, int pageSize = 10, string searchByName = null, double lowestPrice = -1, double highestPrice = -1, string searchByCategoryName = null)
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Search products with filters and pagination."
+        )]
+        public async Task<ActionResult<IEnumerable<ProductDetailsDTO>>> SearchProduct(
+            int pageNumber = 1,
+            int pageSize = 10,
+            string searchByName = null,
+            double lowestPrice = -1,
+            double highestPrice = -1,
+            string searchByCategoryName = null)
         {
-            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            if (pageNumber < 1)
             {
-                return BadRequest("pageNumber must be between 1 and " + pageSize);
+                return BadRequest("PageNumber must be greater than 0.");
             }
+
             var products = await _productService.SearchProduct(pageNumber, pageSize, searchByName, lowestPrice, highestPrice, searchByCategoryName);
-            if (products == null)
+            if (products == null || !products.Any())
             {
                 return NoContent();
             }

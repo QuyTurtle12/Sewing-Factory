@@ -1,5 +1,6 @@
 ﻿using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
+using SewingFactory.Models.Models;
 
 namespace SewingFactory.Services
 {

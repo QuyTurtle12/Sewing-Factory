@@ -11,7 +11,7 @@ namespace SewingFactory.Repositories.DBContext
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<Group> Groups { get; set; }
+        public DbSet<Models.Group> Groups { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Models.Task> Tasks { get; set; }
@@ -49,7 +49,7 @@ namespace SewingFactory.Repositories.DBContext
                 .HasForeignKey(u => u.GroupID);
 
             // Group - Task Relationship
-            modelBuilder.Entity<Group>()
+            modelBuilder.Entity<Models.Group>()
                 .HasMany<Models.Task>()
                 .WithOne()
                 .HasForeignKey(t => t.GroupID)

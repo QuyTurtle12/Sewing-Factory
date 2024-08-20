@@ -119,6 +119,14 @@ namespace SewingFactory
                     // Custom response for authorization failures
                     options.Events = new JwtBearerEvents
                     {
+                        OnChallenge = context =>
+                        {
+                            context.HandleResponse(); // Prevent default response handling
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+                            var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You have not logged in." });
+                            return context.Response.WriteAsync(result);
+                        },
                         OnForbidden = context =>
                         {
                             context.Response.StatusCode = StatusCodes.Status403Forbidden;

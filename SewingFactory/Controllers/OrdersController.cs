@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
+using SewingFactory.Models.Models;
 using SewingFactory.Services.Interface;
 using SewingFactory.Services.Service;
 using Swashbuckle.AspNetCore.Annotations;
