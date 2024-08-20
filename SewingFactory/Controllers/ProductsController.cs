@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
-using SewingFactory.Models.DTO;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Interface;
 
 namespace SewingFactory.Controllers

@@ -1,12 +1,9 @@
-﻿using Humanizer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Service;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
 
 namespace SewingFactory.Controllers
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
-using SewingFactory.Models.DTO;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 

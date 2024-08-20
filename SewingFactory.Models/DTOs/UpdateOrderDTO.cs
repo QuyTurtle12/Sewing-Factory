@@ -1,4 +1,4 @@
-﻿namespace SewingFactory.Models.DTO
+﻿namespace SewingFactory.Models.DTOs
 {
     public class UpdateOrderDTO
     {

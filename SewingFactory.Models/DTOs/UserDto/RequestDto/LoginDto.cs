@@ -1,4 +1,4 @@
-﻿namespace SewingFactory.Services.Dto.UserDto.RequestDto
+﻿namespace SewingFactory.Services.DTOs.UserDto.RequestDto
 {
     /// <summary>
     /// Data Transfer Object for user login information.

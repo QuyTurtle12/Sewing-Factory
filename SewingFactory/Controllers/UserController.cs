@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
 using SewingFactory.Services.Service;
 
 namespace SewingFactory.Controllers

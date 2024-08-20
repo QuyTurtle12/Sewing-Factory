@@ -1,5 +1,5 @@
 ﻿using SewingFactory.Models;
-using SewingFactory.Models.DTO;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Interface
 {
