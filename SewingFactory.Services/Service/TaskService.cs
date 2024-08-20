@@ -4,6 +4,10 @@ using SewingFactory.Repositories.DBContext;
 using SewingFactory.Core;
 using Task = SewingFactory.Models.Task;
 using SewingFactory.Models.DTOs;
+using Microsoft.AspNetCore.Http;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Globalization;
+using System;
 
 
 namespace SewingFactory.Services.Service
@@ -29,19 +33,7 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -51,6 +43,7 @@ namespace SewingFactory.Services.Service
         //Get all tasks (No-pagination view)
         public async Task<IEnumerable<TaskResponseDto>> GetAll()
         {
+
             var tasks = await _dbContext.Tasks
                 .Include(t => t.Order)
                 .Include(t => t.User)
@@ -58,19 +51,7 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             return taskResponseDtos;
         }
@@ -85,18 +66,7 @@ namespace SewingFactory.Services.Service
                 .FirstOrDefaultAsync(t => t.ID == id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
             //define the dto from object
-            var taskResponseDto = new TaskResponseDto
-            {
-                ID = task.ID,
-                OrderID = task.OrderID,
-                Name = task.Name,
-                Description = task.Description,
-                Status = task.Status,
-                CreatorName = task.User?.Name,
-                CreatedDate = task.CreatedDate,
-                Deadline = task.Deadline,
-                GroupName = task.Group?.Name
-            };
+            var taskResponseDto = GetMapper(task);
 
             return taskResponseDto;
 
@@ -134,18 +104,7 @@ namespace SewingFactory.Services.Service
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
             //define responsedto from the object
-            var taskResponseDto = new TaskResponseDto
-            {
-                ID = getTask.ID,
-                OrderID = getTask.OrderID,
-                Name = getTask.Name,
-                Description = getTask.Description,
-                Status = getTask.Status,
-                CreatorName = getTask.User?.Name,
-                CreatedDate = getTask.CreatedDate,
-                Deadline = getTask.Deadline,
-                GroupName = getTask.Group?.Name
-            };
+            var taskResponseDto = GetMapper(task);
 
             return taskResponseDto;
         }
@@ -175,10 +134,14 @@ namespace SewingFactory.Services.Service
                 task.Description = dto.Description;
             }
 
-            if (dto.Deadline.HasValue)
+            if (!string.IsNullOrWhiteSpace(dto.Deadline))
             {
-                task.Deadline = dto.Deadline.Value;
+                DateTime deadline;
+                bool success = DateTime.TryParseExact(dto.Deadline, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out deadline);
+                if (!success) throw new Exception("Incorrect deadline format yyyy-MM-dd HH:mm:ss");
 
+                if (deadline < task.CreatedDate) throw new Exception("Deadline should be set later than created date");
+                task.Deadline = deadline;
             }
 
             await _dbContext.SaveChangesAsync();
@@ -190,18 +153,7 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
-            var taskResponseDto = new TaskResponseDto
-            {
-                ID = getTask.ID,
-                OrderID = getTask.OrderID,
-                Name = getTask.Name,
-                Description = getTask.Description,
-                Status = getTask.Status,
-                CreatorName = getTask.User?.Name,
-                CreatedDate = getTask.CreatedDate,
-                Deadline = getTask.Deadline,
-                GroupName = getTask.Group?.Name
-            };
+            var taskResponseDto = GetMapper(getTask);
 
             return taskResponseDto;
 
@@ -236,18 +188,7 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
-            var taskResponseDto = new TaskResponseDto
-            {
-                ID = getTask.ID,
-                OrderID = getTask.OrderID,
-                Name = getTask.Name,
-                Description = getTask.Description,
-                Status = getTask.Status,
-                CreatorName = getTask.User?.Name,
-                CreatedDate = getTask.CreatedDate,
-                Deadline = getTask.Deadline,
-                GroupName = getTask.Group?.Name
-            };
+            var taskResponseDto = GetMapper(getTask);
 
             return taskResponseDto;
         }
@@ -278,19 +219,7 @@ namespace SewingFactory.Services.Service
 
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -312,19 +241,7 @@ namespace SewingFactory.Services.Service
             if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -345,19 +262,7 @@ namespace SewingFactory.Services.Service
             if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -380,19 +285,7 @@ namespace SewingFactory.Services.Service
 
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -400,12 +293,22 @@ namespace SewingFactory.Services.Service
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatedDate(DateOnly min, DateOnly max, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatedDate(string min, string max, int pageNumber, int pageSize)
         {
-            if (min > max) throw new Exception("Start date should not be later than end date");
+            DateOnly startDateOnly;
+            bool success = DateOnly.TryParseExact(min, "yyyy-MM-dd", out startDateOnly); // Try to parse the string to DateOnly
 
-            DateTime startDate = min.ToDateTime(TimeOnly.MinValue);
-            DateTime endDate = max.ToDateTime(TimeOnly.MaxValue);
+            if (!success) throw new Exception("Incorrect start date format yyyy-mm-dd");
+
+            DateOnly endDateOnly;
+            success = DateOnly.TryParseExact(max, "yyyy-MM-dd", out endDateOnly);
+
+            if (!success) throw new Exception("Incorrect end date format yyyy-mm-dd");
+
+            if (startDateOnly > endDateOnly) throw new Exception("Start date should not be later than end date");
+
+            DateTime startDate = startDateOnly.ToDateTime(TimeOnly.MinValue);
+            DateTime endDate = endDateOnly.ToDateTime(TimeOnly.MaxValue);
 
             var tasks = await _dbContext.Tasks
                 .Where(t => t.CreatedDate >= startDate && t.CreatedDate <= endDate)
@@ -417,19 +320,7 @@ namespace SewingFactory.Services.Service
             if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -437,12 +328,22 @@ namespace SewingFactory.Services.Service
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByDeadline(DateOnly min, DateOnly max, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskResponseDto>> SearchByDeadline(string min, string max, int pageNumber, int pageSize)
         {
-            if (min > max) throw new Exception("Start date should not be later than end date");
+            DateOnly startDateOnly;
+            bool success = DateOnly.TryParseExact(min, "yyyy-MM-dd", out startDateOnly); // Try to parse the string to DateOnly
 
-            DateTime startDate = min.ToDateTime(TimeOnly.MinValue);
-            DateTime endDate = max.ToDateTime(TimeOnly.MaxValue);
+            if (!success) throw new Exception("Incorrect start date format yyyy-MM-dd");
+
+            DateOnly endDateOnly;
+            success = DateOnly.TryParseExact(max, "yyyy-MM-dd", out endDateOnly);
+
+            if (!success) throw new Exception("Incorrect end date format yyyy-MM-dd");
+
+            if (startDateOnly > endDateOnly) throw new Exception("Start date should not be later than end date");
+
+            DateTime startDate = startDateOnly.ToDateTime(TimeOnly.MinValue);
+            DateTime endDate = endDateOnly.ToDateTime(TimeOnly.MaxValue);
 
             var tasks = await _dbContext.Tasks
                 .Where(t => t.Deadline >= startDate && t.CreatedDate <= endDate)
@@ -454,19 +355,7 @@ namespace SewingFactory.Services.Service
             if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
 
             //Transfer to responseDto to display objects
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
-            {
-                ID = t.ID,
-                OrderID = t.OrderID,
-                Name = t.Name,
-                Description = t.Description,
-                Status = t.Status,
-                CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
-                GroupName = t.Group?.Name
-
-            });
+            var taskResponseDtos = GetMapper(tasks);
 
             var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
 
@@ -493,6 +382,33 @@ namespace SewingFactory.Services.Service
             if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
 
             //Transfer to responseDto to display objects
+            var taskResponseDtos = GetMapper(tasks);
+
+            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+
+            return taskPaginatedList.GetPaginatedItems();
+        }
+
+        public TaskResponseDto GetMapper(Task task)
+        {
+            var taskResponseDto = new TaskResponseDto
+            {
+                ID = task.ID,
+                OrderID = task.OrderID,
+                Name = task.Name,
+                Description = task.Description,
+                Status = task.Status,
+                CreatorName = task.User?.Name,
+                CreatedDate = task.CreatedDate.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                Deadline = task.Deadline.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                GroupName = task.Group?.Name
+            };
+
+            return taskResponseDto;
+        }
+
+        public IEnumerable<TaskResponseDto> GetMapper(IEnumerable<Task> tasks)
+        {
             var taskResponseDtos = tasks.Select(t => new TaskResponseDto
             {
                 ID = t.ID,
@@ -501,19 +417,18 @@ namespace SewingFactory.Services.Service
                 Description = t.Description,
                 Status = t.Status,
                 CreatorName = t.User?.Name,
-                CreatedDate = t.CreatedDate,
-                Deadline = t.Deadline,
+                CreatedDate = t.CreatedDate.Value.ToString("yyyy-MM-dd HH:mm:ss"),
+                Deadline = t.Deadline.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                 GroupName = t.Group?.Name
 
             });
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
-
-            return taskPaginatedList.GetPaginatedItems();
+            return taskResponseDtos;
         }
 
-
     }
+
+
 
 
 }

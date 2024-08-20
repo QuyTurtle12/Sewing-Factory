@@ -28,7 +28,8 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "View task list of all groups"
         )]
-        public async Task<IActionResult> GetTasks([Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> GetTasks([Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
+
         {
             try
             {
@@ -86,7 +87,7 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Order")]
         [SwaggerOperation(
             Summary = "Authorization: Order Manager that created that task",
-            Description = "Adjust corresponding order, task name, task description and deadline of the task"
+            Description = "Adjust corresponding order, task name, task description and deadline of the task (deadline must be in [yyyy-MM-dd HH:mm:ss] format)"
         )]
         public async Task<IActionResult> UpdateTaskInfo([Required] Guid id, TaskUpdateDto dto)
         {
@@ -180,7 +181,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search tasks of an order"
         )]
-        public async Task<IActionResult> SearchByOrderID([Required] Guid orderID, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByOrderID([Required] Guid orderID, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -199,7 +200,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search tasks list with the name query, the query is included in the task name"
         )]
-        public async Task<IActionResult> SearchByName([Required] string searchQuery, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByName([Required] string searchQuery, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -218,7 +219,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search tasks list with the status, using min and max range to find (use the same values for both to find exactly)"
         )]
-        public async Task<IActionResult> SearchByStatus([Required, Range(0, 1)] double min, [Required, Range(0, 1)] double max, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByStatus([Required, Range(0, 1)] double min, [Required, Range(0, 1)] double max, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -237,7 +238,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search tasks of a creator"
         )]
-        public async Task<IActionResult> SearchByCreatorID([Required] Guid creatorID, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByCreatorID([Required] Guid creatorID, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -256,7 +257,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search task list with the created date [yyyy-mm-dd], using the range to find tasks within (use the same values for both to find exactly)"
         )]
-        public async Task<IActionResult> SearchByCreatedDate([Required] DateOnly startDate, [Required] DateOnly endDate, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByCreatedDate([Required] string startDate, [Required] string endDate, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -275,7 +276,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search task list with the deadline [yyyy-mm-dd], using the range to find tasks within (use the same values for both to find exactly)"
         )]
-        public async Task<IActionResult> SearchByDeadline([Required] DateOnly startDate, [Required] DateOnly endDate, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByDeadline([Required] string startDate, [Required] string endDate, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
@@ -294,7 +295,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager & Sewing Staff",
             Description = "Search tasks list with the group name query, must be exact name"
         )]
-        public async Task<IActionResult> SearchByGroupName([Required] string groupName, [Required] int pageNumber = 1, [Required] int pageSize = 10)
+        public async Task<IActionResult> SearchByGroupName([Required] string groupName, [Required, Range(1, int.MaxValue)] int pageNumber = 1, [Required, Range(1, int.MaxValue)] int pageSize = 10)
         {
             try
             {
