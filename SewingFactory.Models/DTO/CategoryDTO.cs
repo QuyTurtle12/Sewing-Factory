@@ -1,5 +1,4 @@
-﻿
-namespace SewingFactory.Models.DTOs
+﻿namespace SewingFactory.Models.DTO
 {
     public class CategoryDTO
     {

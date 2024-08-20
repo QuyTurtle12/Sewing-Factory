@@ -24,7 +24,7 @@ namespace SewingFactory.Services.Service
         // Add a new order to database
         public async Task<bool> AddOrder(AddOrderDTO dto, Guid userID)
         {
-            var product = await _productService.GetProduct(dto.ProductID);
+            var product = await _productService.GetProductAsync(dto.ProductID);
             double? totalAmount = product.Price * dto.Quantity;
 
             var order = new Order()
@@ -47,7 +47,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Show all orders info at human view point
-        public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList(int pageNumber, int pageSize)
+        public async Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize)
         {
             IEnumerable<Order> orderList = await GetOrderList();
             var orderDtos = new List<GetOrderDTO>();
@@ -73,6 +73,32 @@ namespace SewingFactory.Services.Service
 
             return orderPaginationList.GetPaginatedItems();
         }
+
+        public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList()
+        {
+            IEnumerable<Order> orderList = await GetOrderList();
+            var orderDtos = new List<GetOrderDTO>();
+
+            foreach (var order in orderList)
+            {
+                var orderDTO = new GetOrderDTO
+                {
+                    OrderDate = DateTime.Now,
+                    FinishedDate = order.FinishedDate,
+                    CustomerName = order.CustomerName,
+                    CustomerPhone = order.CustomerPhone,
+                    Quantity = order.Quantity,
+                    TotalAmount = order.TotalAmount,
+                    Status = order.Status,
+                    CreatorName = await _userService.GetUserName(order.UserID),
+                    ProductName = await _productService.GetProductName(order.ProductID)
+                };
+                orderDtos.Add(orderDTO);
+            }
+
+            return orderDtos;
+        }
+
 
         public async Task<Order> GetOrder(Guid orderID)
         {
@@ -111,7 +137,7 @@ namespace SewingFactory.Services.Service
         public async Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone)
         {
             // Validate Product if they are null or disable
-            var product = await _productService.GetProduct(productID);
+            var product = await _productService.GetProductAsync(productID);
             if (!(product?.Status ?? false))
             {
                 return "Invalid Product";

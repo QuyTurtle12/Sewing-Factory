@@ -29,6 +29,7 @@ namespace SewingFactory
             // Register Services in Dependency Injection Container
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
             builder.Services.AddScoped<UserService>();
             builder.Services.AddScoped<ValidationService>();

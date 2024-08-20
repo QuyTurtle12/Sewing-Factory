@@ -11,7 +11,9 @@ namespace SewingFactory.Services.Interface
 
         Task<GetOrderDTO> GetOrderDTO(Guid orderID);
 
-        Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList(int pageNumber, int pageSize);
+        Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize);
+
+        Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList();
 
         Task<bool> IsValidOrder(Guid orderID);
 

@@ -1,116 +1,105 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.DTOs;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
-using SewingFactory.Repositories.DBContext;
+using SewingFactory.Models.DTO;
+using SewingFactory.Services.Interface;
 
 namespace SewingFactory.Controllers
 {
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoriesController(DatabaseContext context)
+        public CategoriesController(ICategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategories(int pageNumber = 1, int pageSize = 10)
         {
-            return await _context.Categories.ToListAsync();
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var categories = await _categoryService.GetCategoriesAsync(pageNumber, pageSize);
+            return Ok(categories);
         }
 
         // GET: api/Categories/5
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
+        [ActionName("GetCategoryById")]
         public async Task<ActionResult<Category>> GetCategory(Guid id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _categoryService.GetCategoryByIdAsync(id);
 
             if (category == null)
             {
                 return NotFound();
             }
 
-            return category;
+            return Ok(new { category.ID, category.Name });
         }
 
+        [Authorize(Policy = "Product")]
         // PUT: api/Categories/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutCategory(Guid id, [FromBody] string name)
+        public async Task<IActionResult> PutCategory(Guid id, CategoryDTO categoryDTO)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            if (id != category.ID)
-            {
-                return BadRequest();
-            }
-
-            category.Name = name; //update the name
-
-            _context.Entry(category).State = EntityState.Modified;
-
+            Category category;
             try
             {
-                await _context.SaveChangesAsync();
+                await _categoryService.UpdateCategoryAsync(id, categoryDTO);
+                category = await _categoryService.GetCategoryByIdAsync(id);
             }
-            catch (DbUpdateConcurrencyException)
+            catch (ArgumentException ex)
             {
-                if (!CategoryExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
             }
 
-            return NoContent();
+            return Ok(new { category.ID, category.Name });
         }
 
+        [Authorize(Policy = "Product")]
         // POST: api/Categories
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory([FromBody] string name)
+        public async Task<ActionResult<Category>> PostCategory(CategoryDTO categoryDTO)
         {
-            var category = new Category
+            Category newCategory;
+            try
             {
-                Name = name
-            };
+                newCategory = await _categoryService.CreateCategoryAsync(categoryDTO);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetCategory", new { id = category.ID }, category);
+            return Ok(new { newCategory.ID, newCategory.Name });
         }
 
-        // DELETE: api/Categories/5
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteCategory(Guid id)
-        //{
-        //    var category = await _context.Categories.FindAsync(id);
-        //    if (category == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    _context.Categories.Remove(category);
-        //    await _context.SaveChangesAsync();
-
-        //    return NoContent();
-        //}
-
-        private bool CategoryExists(Guid id)
+        [Authorize(Policy = "Product")]
+        [HttpGet("searchCategory")]
+        public async Task<ActionResult<IEnumerable<Category>>> SearchCategory(int pageNumber = 1, int pageSize = 10, string searchTerm = null)
         {
-            return _context.Categories.Any(e => e.ID == id);
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var categories = await _categoryService.SearchCategory(pageNumber, pageSize, searchTerm);
+            if (categories == null)
+            {
+                return NoContent();
+            }
+            return Ok(categories);
         }
     }
 }

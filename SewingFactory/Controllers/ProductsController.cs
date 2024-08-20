@@ -1,9 +1,8 @@
-﻿
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.DTOs;
 using SewingFactory.Models;
-using SewingFactory.Repositories.DBContext;
+using SewingFactory.Models.DTO;
+using SewingFactory.Services.Interface;
 
 namespace SewingFactory.Controllers
 {
@@ -11,56 +10,36 @@ namespace SewingFactory.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly DatabaseContext _context;
+        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-        public ProductsController(DatabaseContext context)
+        public ProductsController(IProductService productService, ICategoryService categoryService)
         {
-            _context = context;
+            _productService = productService;
+            _categoryService = categoryService;
         }
 
+        [Authorize(Policy = "Product")]
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<object>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetProducts(int pageNumber = 1, int pageSize = 10)
         {
-            var productsWithCategory = await _context.Products
-                .Join(
-                    _context.Categories,
-                    product => product.CategoryID,
-                    category => category.ID,
-                    (product, category) => new
-                    {
-                        product.ID,
-                        product.Name,
-                        CategoryName = category.Name,
-                        product.Price,
-                        product.Status
-                    })
-                .ToListAsync();
-
-
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var productsWithCategory = await _productService.GetProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
         [HttpGet("GetAllExistProducts")]
-        public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts()
+        public async Task<ActionResult<IEnumerable<object>>> GetAllExistProducts(int pageNumber = 1, int pageSize = 10)
         {
-            var productsWithCategory = await _context.Products
-                .Where(p => p.Status == true) // Filter products with status == true
-                .Join(
-                    _context.Categories,
-                    product => product.CategoryID,
-                    category => category.ID,
-                    (product, category) => new
-                    {
-                        product.ID,
-                        product.Name,
-                        CategoryName = category.Name,
-                        product.Price,
-                        product.Status
-                    })
-                .ToListAsync();
-
-
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var productsWithCategory = await _productService.GetAllExistProductsAsync(pageNumber, pageSize);
             return Ok(productsWithCategory);
         }
 
@@ -68,20 +47,7 @@ namespace SewingFactory.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<object>> GetProduct(Guid id)
         {
-            var productWithCategory = await _context.Products
-                .Join(
-                    _context.Categories,
-                    product => product.CategoryID,
-                    category => category.ID,
-                    (product, category) => new
-                    {
-                        product.ID,
-                        product.Name,
-                        CategoryName = category.Name,
-                        product.Price,
-                        product.Status
-                    })
-                .FirstOrDefaultAsync(p => p.ID == id);
+            var productWithCategory = await _productService.GetProductAsync(id);
 
             if (productWithCategory == null)
             {
@@ -91,123 +57,109 @@ namespace SewingFactory.Controllers
             return Ok(productWithCategory);
         }
 
+        [Authorize(Policy = "Product")]
         // PUT: api/Products/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
         {
-            // Validate that Name is not null, empty, or whitespace
             if (string.IsNullOrWhiteSpace(productDTO.Name))
             {
                 return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
             }
 
-            // Validate that CategoryID is not an empty GUID
             if (productDTO.CategoryID == Guid.Empty)
             {
                 return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
             }
 
-            // Validate that Price is greater than 0
             if (productDTO.Price <= 0)
             {
                 return BadRequest(new { message = "Price must be greater than 0." });
             }
 
-            var existingProduct = await _context.Products.FindAsync(id);
-            if (existingProduct == null)
-            {
-                return NotFound(new { message = "Product not found." });
-            }
-
-            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            var categoryExists = await _productService.CategoryExistsAsync(productDTO.CategoryID);
             if (!categoryExists)
             {
                 return NotFound(new { message = "Category not found." });
             }
 
-            existingProduct.Name = productDTO.Name;
-            existingProduct.CategoryID = productDTO.CategoryID;
-            existingProduct.Price = productDTO.Price;
-
-            _context.Entry(existingProduct).State = EntityState.Modified;
-
-            try
+            var result = await _productService.UpdateProductAsync(id, productDTO);
+            if (!result)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProductExists(id))
-                {
-                    return NotFound(new { message = "Product not found." });
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound(new { message = "Product not found." });
             }
 
-            return NoContent();
+            var product = await _productService.GetProductAsync(id);
+            return Ok(product);
         }
 
+        [Authorize(Policy = "Product")]
         // POST: api/Products
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
         {
-            // Validate that Name is not null, empty, or whitespace
             if (string.IsNullOrWhiteSpace(productDTO.Name))
             {
                 return BadRequest(new { message = "Name is required and cannot be empty or whitespace." });
             }
 
-            // Validate that CategoryID is not an empty GUID
             if (productDTO.CategoryID == Guid.Empty)
             {
                 return BadRequest(new { message = "CategoryID is required and cannot be an empty GUID." });
             }
 
-            // Validate that Price is greater than 0
             if (productDTO.Price <= 0)
             {
                 return BadRequest(new { message = "Price must be greater than 0." });
             }
 
-            // Check if the CategoryID exists in the Categories table
-            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            var categoryExists = await _productService.CategoryExistsAsync(productDTO.CategoryID);
             if (!categoryExists)
             {
                 return NotFound(new { message = "Category not found." });
             }
 
-            Product newProduct = new Product(productDTO.Name, productDTO.CategoryID, productDTO.Price);
-
-            _context.Products.Add(newProduct);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetProduct", new { id = newProduct.ID }, newProduct);
+            var newProduct = await _productService.CreateProductAsync(productDTO);
+            var category = await _categoryService.GetCategoryByIdAsync(newProduct.CategoryID);
+            return Ok(new { newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status });
         }
 
+        [Authorize(Policy = "Product")]
         // PUT: api/Products/ChangeStatus/5
         [HttpPut("ChangeStatus/{id}")]
         public async Task<IActionResult> ChangeProductStatus(Guid id)
         {
-            var existingProduct = await _context.Products.FindAsync(id);
-            if (existingProduct == null)
+            try
             {
-                return NotFound(new { message = "Product not found." });
+                var result = await _productService.ChangeProductStatusAsync(id);
+                if (!result)
+                {
+                    return NotFound(new { message = "Product not found." });
+                }
+
+                var product = await _productService.GetProductAsync(id);
+                return Ok(product);
             }
-
-            existingProduct.Status = !existingProduct.Status;
-
-            _context.Entry(existingProduct).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (Exception e)
+            {
+                return StatusCode(500, $"{e.Message}");
+            }
         }
 
-        private bool ProductExists(Guid id)
+        [Authorize(Policy = "Product")]
+        [HttpGet("searchProduct")]
+        public async Task<ActionResult<IEnumerable<ProductDetailsDTO>>> SearchProduct(int pageNumber = 1, int pageSize = 10, string searchByName = null, double lowestPrice = -1, double highestPrice = -1, string searchByCategoryName = null)
         {
-            return _context.Products.Any(e => e.ID == id);
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var products = await _productService.SearchProduct(pageNumber, pageSize, searchByName, lowestPrice, highestPrice, searchByCategoryName);
+            if (products == null)
+            {
+                return NoContent();
+            }
+            return Ok(products);
         }
     }
 }

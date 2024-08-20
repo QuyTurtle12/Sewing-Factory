@@ -4,6 +4,7 @@ using SewingFactory.Models;
 using SewingFactory.Models.DTO;
 using SewingFactory.Services.Interface;
 using SewingFactory.Services.Service;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SewingFactory.Controllers
 {
@@ -20,16 +21,44 @@ namespace SewingFactory.Controllers
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
         }
 
+        // GET: api/Orders/page
+        // Get all orders
+        // Only Cashier or Order Manager can use
+        [Authorize(Policy = "Cashier-Order")]
+        [HttpGet]
+        [Route("page")]
+        [SwaggerOperation(
+            Summary = "Authorization: Cashier & Order Manager",
+            Description = "View order list in a page"
+        )]
+        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetOrdersInPage(int pageNumber = 1, int pageSize = 5)
+        {
+            try
+            {
+                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllPagedOrderDTOList(pageNumber, pageSize);
+                return Ok(orderList);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, ex.Message);
+            }
+        }
+
         // GET: api/Orders
         // Get all orders
         // Only Cashier or Order Manager can use
         [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders(int pageNumber = 1, int pageSize = 5)
+        [SwaggerOperation(
+            Summary = "Authorization: Cashier & Order Manager",
+            Description = "View order list"
+        )]
+        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders()
         {
             try
             {
-                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllOrderDTOList(pageNumber, pageSize);
+                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllOrderDTOList();
                 return Ok(orderList);
             }
             catch (Exception ex)
@@ -45,6 +74,10 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
         [Route("{id}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Cashier & Order Manager",
+            Description = "View an order by order id"
+        )]
         public async Task<ActionResult<GetOrderDTO>> GetOrder(Guid id)
         {
             try
@@ -65,6 +98,10 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Cashier-Order")]
         [HttpGet]
         [Route("search")]
+        [SwaggerOperation(
+            Summary = "Authorization: Cashier & Order Manager",
+            Description = "Search order list by a filter. Filter list: status, cashier id, customer phone, order date, finish date, total amount"
+        )]
         public async Task<ActionResult<IEnumerable<GetOrderDTO>>> SearchOrderList(int pageNumber = 1, int pageSize = 5, string? firstInputValue = null, string? secondInputValue = null, string filter = "status")
         {
             try
@@ -82,6 +119,10 @@ namespace SewingFactory.Controllers
         // Only Cashier can use
         [Authorize(Policy = "Cashier")]
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Authorization: Cashier",
+            Description = "Add order"
+        )]
         public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
         {
             try
@@ -135,6 +176,10 @@ namespace SewingFactory.Controllers
         // Only Order Manager can use
         [Authorize(Policy = "Order")]
         [HttpPut]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager",
+            Description = "Update Order Status"
+        )]
         public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
         {
             try
