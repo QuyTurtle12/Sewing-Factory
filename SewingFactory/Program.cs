@@ -110,6 +110,30 @@ namespace SewingFactory
                         IssuerSigningKey = key,
                         ClockSkew = TimeSpan.Zero
                     };
+<<<<<<< Updated upstream
+=======
+
+                    // Custom response for authorization failures
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnForbidden = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                            context.Response.ContentType = "application/json";
+                            var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
+                            return context.Response.WriteAsync(result);
+                        },
+
+                        OnChallenge = context =>
+                        {
+                            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                            context.Response.ContentType = "application/json";
+                            var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Authentication is required to access this resource." });
+                            context.HandleResponse(); // Prevents the default challenge response
+                            return context.Response.WriteAsync(result);
+                        }
+                    };
+>>>>>>> Stashed changes
                 });
 
             // Configure authorization services

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Services.Dto.UserDto.RequestDto;
 using SewingFactory.Services.Service;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SewingFactory.Controllers
 {
@@ -25,6 +26,10 @@ namespace SewingFactory.Controllers
         /// <returns>ActionResult indicating success or failure.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpPost]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Create a new user"
+        )]
         public async Task<IActionResult> CreateUser([FromBody] CreateDto request)
         {
             if (request == null)
@@ -50,6 +55,10 @@ namespace SewingFactory.Controllers
         /// <returns>ActionResult with a list of users or an error message.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("listed")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a list of all users"
+        )]
         public async Task<IActionResult> GetAllUsers()
         {
             try
@@ -81,6 +90,10 @@ namespace SewingFactory.Controllers
         /// <returns>A paginated list of UserDto objects and the total count of users.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("search")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of searched/filtered users"
+        )]
         public async Task<ActionResult> SearchUsers(
             [FromQuery] string? name,
             [FromQuery] string? username,
@@ -125,6 +138,10 @@ namespace SewingFactory.Controllers
         /// <returns>An IActionResult containing the paginated user data, or an error message if the request is invalid or fails.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("paged")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of all users"
+        )]
         public async Task<IActionResult> GetPagedUsers(int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -170,6 +187,10 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet]
         [Route("{id:guid}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a user by id"
+        )]
         public async Task<IActionResult> GetUserById(Guid id)
         {
             try
@@ -194,6 +215,10 @@ namespace SewingFactory.Controllers
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpPut]
         [Route("{id:guid}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Update a user"
+        )]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateDto request)
         {
             try
@@ -217,6 +242,10 @@ namespace SewingFactory.Controllers
         /// <returns>ActionResult with the updated user details or an error message.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpPatch("{id}/status")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Enable/disable a user"
+        )]
         public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateUserStatusDto statusDto)
         {
             if (id == Guid.Empty)
@@ -270,6 +299,9 @@ namespace SewingFactory.Controllers
         /// <param name="request">The password change request data.</param>
         /// <returns>ActionResult indicating success or failure of the password change.</returns>
         [HttpPost("{id}/change-password")]
+        [SwaggerOperation(
+            Description = "change password"
+        )]
         public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordForStaffDto request)
         {
             if (request == null)
@@ -310,6 +342,10 @@ namespace SewingFactory.Controllers
         /// <returns>A paginated list of users and the total count of users.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("search/role-group-id")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of searched/filtered users by role/group id"
+        )]
         public async Task<IActionResult> GetUsersByRoleAndGroup(Guid? roleId = null, Guid? groupId = null, int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -346,6 +382,10 @@ namespace SewingFactory.Controllers
         /// <returns>A paginated list of users and the total count of users.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("search/role-group-name")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of searched/filtered users by role/group name"
+        )]
         public async Task<IActionResult> GetUsersByRoleAndGroupName(string? roleName, string? groupName, int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -380,6 +420,10 @@ namespace SewingFactory.Controllers
         /// <returns>A paginated list of users and the total count of users.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("search/name")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of searched/filtered users by name"
+        )]
         public async Task<IActionResult> GetUsersByName(string? name, int pageNumber = 1, int pageSize = 10)
         {
             try
@@ -414,6 +458,10 @@ namespace SewingFactory.Controllers
         /// <returns>A paginated list of users and the total count of users.</returns>
         [Authorize(Policy = "Staff-Manager-Policy")]
         [HttpGet("search/status")]
+        [SwaggerOperation(
+            Summary = "Authorization: Staff Manager",
+            Description = "Get a page of searched/filtered users by status"
+        )]
         public async Task<IActionResult> GetUsersByStatus(bool? status = true, int pageNumber = 1, int pageSize = 10)
         {
             try
