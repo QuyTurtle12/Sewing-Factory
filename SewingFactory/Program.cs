@@ -109,10 +109,6 @@ namespace SewingFactory
                         ClockSkew = TimeSpan.Zero
                     };
 
-<<<<<<< HEAD
-
-=======
->>>>>>> main
                     // Custom response for authorization failures
                     options.Events = new JwtBearerEvents
                     {
@@ -122,7 +118,6 @@ namespace SewingFactory
                             context.Response.ContentType = "application/json";
                             var result = System.Text.Json.JsonSerializer.Serialize(new { message = "You do not have access to this resource." });
                             return context.Response.WriteAsync(result);
-<<<<<<< HEAD
                         },
 
                         OnChallenge = context =>
@@ -132,8 +127,7 @@ namespace SewingFactory
                             var result = System.Text.Json.JsonSerializer.Serialize(new { message = "Authentication is required to access this resource." });
                             context.HandleResponse(); // Prevents the default challenge response
                             return context.Response.WriteAsync(result);
-=======
->>>>>>> main
+
                         }
                     };
                 });
