@@ -41,6 +41,27 @@ namespace SewingFactory.Controllers
 
         }
 
+        // GET: api/Tasks
+        [HttpGet("full")]
+        [Authorize(Policy = "Order-Sewing")]
+        [SwaggerOperation(
+            Summary = "Authorization: Order Manager & Sewing Staff",
+            Description = "View task list of all groups (Non-pagination view)"
+        )]
+        public async Task<IActionResult> GetTasks()
+        {
+            try
+            {
+                return Ok(await _taskService.GetAll());
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"{ex.Message}");
+            }
+
+        }
+
+
         // GET: api/Tasks/5
         [HttpGet("{id:guid}")]
         [Authorize(Policy = "Order-Sewing")]

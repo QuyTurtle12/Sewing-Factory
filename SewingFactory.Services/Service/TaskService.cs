@@ -48,6 +48,33 @@ namespace SewingFactory.Services.Service
             return taskPaginatedList.GetPaginatedItems();
         }
 
+        //Get all tasks (No-pagination view)
+        public async Task<IEnumerable<TaskResponseDto>> GetAll()
+        {
+            var tasks = await _dbContext.Tasks
+                .Include(t => t.Order)
+                .Include(t => t.User)
+                .Include(t => t.Group)
+                .ToListAsync();
+
+            //Transfer to responseDto to display objects
+            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            {
+                ID = t.ID,
+                OrderID = t.OrderID,
+                Name = t.Name,
+                Description = t.Description,
+                Status = t.Status,
+                CreatorName = t.User?.Name,
+                CreatedDate = t.CreatedDate,
+                Deadline = t.Deadline,
+                GroupName = t.Group?.Name
+
+            });
+
+            return taskResponseDtos;
+        }
+
         //Get task by id
         public async Task<TaskResponseDto> GetById(Guid id)
         {
@@ -381,7 +408,7 @@ namespace SewingFactory.Services.Service
             DateTime endDate = max.ToDateTime(TimeOnly.MaxValue);
 
             var tasks = await _dbContext.Tasks
-                .Where(t => t.CreatedDate >=  startDate && t.CreatedDate <= endDate)
+                .Where(t => t.CreatedDate >= startDate && t.CreatedDate <= endDate)
                 .Include(t => t.Order)
                 .Include(t => t.User)
                 .Include(t => t.Group)
