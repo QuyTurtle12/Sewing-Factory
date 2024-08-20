@@ -17,16 +17,31 @@ namespace SewingFactory.Services.Service
 
         public async Task<IEnumerable<object>> GetCategoriesAsync(int pageNumber, int pageSize)
         {
-            return await _context.Categories
+            if (pageNumber < 0 || pageSize < 0) //return all
+            {
+                return await _context.Categories
+                                 .Select(c => new { c.ID, c.Name })
+                                 .ToListAsync();
+            }
+            else
+            {
+                return await _context.Categories
                                  .Skip((pageNumber - 1) * pageSize)
                                  .Take(pageSize)
                                  .Select(c => new { c.ID, c.Name })
                                  .ToListAsync();
+            }
         }
 
         public async Task<Category> GetCategoryByIdAsync(Guid id)
         {
-            return await _context.Categories.FindAsync(id);
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null)
+            {
+                throw new KeyNotFoundException($"Category with ID '{id}' not found.");
+            }
+
+            return category;
         }
 
         public async Task<bool> CategoryExistsAsync(Guid id)

@@ -18,7 +18,26 @@ namespace SewingFactory.Services.Service
 
         public async Task<IEnumerable<object>> GetProductsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Products
+            if (pageNumber < 0 || pageSize < 0)
+            {
+                return await _context.Products
+                .Join(
+                    _context.Categories,
+                    product => product.CategoryID,
+                    category => category.ID,
+                    (product, category) => new
+                    {
+                        product.ID,
+                        product.Name,
+                        CategoryName = category.Name,
+                        product.Price,
+                        product.Status
+                    })
+                .ToListAsync();
+            }
+            else
+            {
+                return await _context.Products
                 .Join(
                     _context.Categories,
                     product => product.CategoryID,
@@ -34,6 +53,7 @@ namespace SewingFactory.Services.Service
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
+            }
         }
 
         public async Task<IEnumerable<object>> GetAllExistProductsAsync(int pageNumber, int pageSize)
@@ -59,7 +79,7 @@ namespace SewingFactory.Services.Service
 
         public async Task<ProductDetailsDTO> GetProductAsync(Guid id)
         {
-            return await _context.Products
+            var product = await _context.Products
                 .Join(
                     _context.Categories,
                     product => product.CategoryID,
@@ -73,6 +93,13 @@ namespace SewingFactory.Services.Service
                         Status = product.Status
                     })
                 .FirstOrDefaultAsync(p => p.ID == id);
+
+            if (product == null)
+            {
+                throw new KeyNotFoundException($"Product with ID '{id}' not found.");
+            }
+
+            return product;
         }
 
 
@@ -87,7 +114,13 @@ namespace SewingFactory.Services.Service
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
             {
-                return false;
+                throw new KeyNotFoundException($"Product with ID '{id}' not found.");
+            }
+
+            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            if (!categoryExists)
+            {
+                throw new KeyNotFoundException($"Category with ID '{productDTO.CategoryID}' not found.");
             }
 
             existingProduct.Name = productDTO.Name;
@@ -102,6 +135,17 @@ namespace SewingFactory.Services.Service
 
         public async Task<Product> CreateProductAsync(ProductDTO productDTO)
         {
+            if (string.IsNullOrWhiteSpace(productDTO.Name))
+            {
+                throw new ArgumentException("Product name is required and cannot be empty or whitespace.");
+            }
+
+            var categoryExists = await _context.Categories.AnyAsync(c => c.ID == productDTO.CategoryID);
+            if (!categoryExists)
+            {
+                throw new KeyNotFoundException($"Category with ID '{productDTO.CategoryID}' not found.");
+            }
+
             Product newProduct = new Product(productDTO.Name, productDTO.CategoryID, productDTO.Price);
             _context.Products.Add(newProduct);
             await _context.SaveChangesAsync();
@@ -113,7 +157,7 @@ namespace SewingFactory.Services.Service
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
             {
-                return false;
+                throw new KeyNotFoundException($"Product with ID '{id}' not found.");
             }
 
             existingProduct.Status = !existingProduct.Status;
@@ -169,6 +213,11 @@ namespace SewingFactory.Services.Service
             if (!string.IsNullOrEmpty(searchByCategoryName))
             {
                 query = query.Where(p => p.Name.ToUpper().Contains(searchByCategoryName.ToUpper()));
+            }
+
+            if (!query.Any())
+            {
+                throw new KeyNotFoundException("No products matched the search criteria.");
             }
 
             return await query

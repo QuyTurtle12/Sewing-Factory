@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Interface;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace SewingFactory.Controllers
 {
@@ -20,86 +20,125 @@ namespace SewingFactory.Controllers
 
         // GET: api/Categories
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Category>>> GetCategories(int pageNumber = 1, int pageSize = 10)
+        [SwaggerOperation(
+            Summary = "Authorization: Anyone",
+            Description = "Get all categories with pagination; set pageSize to -1 to get all"
+        )]
+        public async Task<ActionResult<IEnumerable<object>>> GetCategories(int pageNumber = 1, int pageSize = 10)
         {
-            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            if (pageSize != -1 && (pageNumber < 1 || pageNumber > pageSize))
             {
                 return BadRequest("pageNumber must be between 1 and " + pageSize);
             }
+
             var categories = await _categoryService.GetCategoriesAsync(pageNumber, pageSize);
             return Ok(categories);
         }
 
         // GET: api/Categories/5
         [HttpGet("{id:guid}")]
-        [ActionName("GetCategoryById")]
-        public async Task<ActionResult<Category>> GetCategory(Guid id)
+        [SwaggerOperation(
+            Summary = "Authorization: Anyone",
+            Description = "Get category by ID"
+        )]
+        public async Task<ActionResult<object>> GetCategory(Guid id)
         {
-            var category = await _categoryService.GetCategoryByIdAsync(id);
-
-            if (category == null)
+            try
             {
-                return NotFound();
+                var category = await _categoryService.GetCategoryByIdAsync(id);
+                return Ok(new { category.ID, category.Name });
             }
-
-            return Ok(new { category.ID, category.Name });
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [Authorize(Policy = "Product")]
         // PUT: api/Categories/5
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Update category"
+        )]
         public async Task<IActionResult> PutCategory(Guid id, CategoryDTO categoryDTO)
         {
-            Category category;
             try
             {
                 await _categoryService.UpdateCategoryAsync(id, categoryDTO);
-                category = await _categoryService.GetCategoryByIdAsync(id);
+                var category = await _categoryService.GetCategoryByIdAsync(id);
+                return Ok(new { category.ID, category.Name });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (KeyNotFoundException)
+            catch (KeyNotFoundException ex)
             {
-                return NotFound();
+                return NotFound(ex.Message);
             }
-
-            return Ok(new { category.ID, category.Name });
         }
 
         [Authorize(Policy = "Product")]
         // POST: api/Categories
         [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(CategoryDTO categoryDTO)
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Create a new category"
+        )]
+        public async Task<ActionResult<object>> PostCategory(CategoryDTO categoryDTO)
         {
-            Category newCategory;
             try
             {
-                newCategory = await _categoryService.CreateCategoryAsync(categoryDTO);
+                var newCategory = await _categoryService.CreateCategoryAsync(categoryDTO);
+                return Ok(new { newCategory.ID, newCategory.Name });
             }
             catch (ArgumentException ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
-
-            return Ok(new { newCategory.ID, newCategory.Name });
         }
 
         [Authorize(Policy = "Product")]
         [HttpGet("searchCategory")]
-        public async Task<ActionResult<IEnumerable<Category>>> SearchCategory(int pageNumber = 1, int pageSize = 10, string searchTerm = null)
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Search for categories by name with pagination"
+        )]
+        public async Task<ActionResult<IEnumerable<object>>> SearchCategory(int pageNumber = 1, int pageSize = 10, string searchTerm = null)
         {
-            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            if (pageNumber < 1 || pageNumber > pageSize)
             {
                 return BadRequest("pageNumber must be between 1 and " + pageSize);
             }
+
             var categories = await _categoryService.SearchCategory(pageNumber, pageSize, searchTerm);
-            if (categories == null)
+            if (categories == null || !categories.Any())
             {
                 return NoContent();
             }
+
             return Ok(categories);
+        }
+
+        [Authorize(Policy = "Product")]
+        // DELETE: api/Categories/5
+        [HttpDelete("{id:guid}")]
+        [SwaggerOperation(
+            Summary = "Authorization: Product Manager",
+            Description = "Delete a category by ID"
+        )]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            try
+            {
+                await _categoryService.DeleteCategoryAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

@@ -49,29 +49,42 @@ namespace SewingFactory.Services.Service
         // Show all orders info at human view point
         public async Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize)
         {
-            IEnumerable<Order> orderList = await GetOrderList();
-            var orderDtos = new List<GetOrderDTO>();
-
-            foreach (var order in orderList)
+            try
             {
-                var orderDTO = new GetOrderDTO
+                IEnumerable<Order> orderList = await GetOrderList();
+                var orderDtos = new List<GetOrderDTO>();
+
+                foreach (var order in orderList)
                 {
-                    OrderDate = DateTime.Now,
-                    FinishedDate = order.FinishedDate,
-                    CustomerName = order.CustomerName,
-                    CustomerPhone = order.CustomerPhone,
-                    Quantity = order.Quantity,
-                    TotalAmount = order.TotalAmount,
-                    Status = order.Status,
-                    CreatorName = await _userService.GetUserName(order.UserID),
-                    ProductName = await _productService.GetProductName(order.ProductID)
-                };
-                orderDtos.Add(orderDTO);
+                    var orderDTO = new GetOrderDTO
+                    {
+                        OrderDate = DateTime.Now,
+                        FinishedDate = order.FinishedDate,
+                        CustomerName = order.CustomerName,
+                        CustomerPhone = order.CustomerPhone,
+                        Quantity = order.Quantity,
+                        TotalAmount = order.TotalAmount,
+                        Status = order.Status,
+                        CreatorName = await _userService.GetUserName(order.UserID),
+                        ProductName = await _productService.GetProductName(order.ProductID)
+                    };
+                    orderDtos.Add(orderDTO);
+                }
+
+                var orderPaginationList = new PaginatedList<GetOrderDTO>(orderDtos, pageNumber, pageSize);
+
+                return orderPaginationList.GetPaginatedItems();
             }
-
-            var orderPaginationList = new PaginatedList<GetOrderDTO>(orderDtos, pageNumber, pageSize);
-
-            return orderPaginationList.GetPaginatedItems();
+            catch (ArgumentOutOfRangeException ex)
+            {
+                // Specific handling for pagination issues
+                throw new Exception("Invalid pagination parameters: " + ex.Message);
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error: " + e.Message);
+            }
+            
         }
 
         public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList()
@@ -257,17 +270,30 @@ namespace SewingFactory.Services.Service
                         result = await GetTotalAmountInRange(filter, orders, Double.Parse(firstInputValue), Double.Parse(secondInputValue));
                         break;
                     default:
-
-                        break;
+                        throw new ArgumentException($"Invalid {nameof(filter)}: {filter}. Allowed filters are 'status', 'cashier id', 'customer phone', 'order date', 'finish date', 'total amount'.");
                 }
+                // Create a new PaginatedList object, which handles the pagination logic for the results.
                 var orderPaginationList = new PaginatedList<GetOrderDTO>(result, pageNumber, pageSize);
 
+                // Retrieve the paginated items from the PaginatedList.
                 return orderPaginationList.GetPaginatedItems();
+            }
+            catch (FormatException ex)
+            {
+                // Specific handling for format issues
+                throw new Exception("Invalid format: " + ex.Message);
+            }
+            catch (ArgumentOutOfRangeException ex)
+            {
+                // Specific handling for pagination issues
+                throw new Exception("Invalid pagination parameters: " + ex.Message);
             }
             catch (Exception ex)
             {
-                throw new Exception("Error :" + ex.Message);
+                // General exception handling
+                throw new Exception("An error occurred: " + ex.Message);
             }
+
 
         }
 
@@ -357,13 +383,19 @@ namespace SewingFactory.Services.Service
 
                     return result;
                 default:
-                    return new List<GetOrderDTO>(); // Return an empty list
+                    throw new ArgumentException("Invalid Status: The provided status is not valid.");
             }
         }
 
         // Get order list by cashier id
         private async Task<IEnumerable<GetOrderDTO>> CashierIDFilterAsync(string? inputValue, IEnumerable<Order> orders)
         {
+            // Validate the input value
+            if (string.IsNullOrWhiteSpace(inputValue) || !Guid.TryParse(inputValue, out Guid cashierID))
+            {
+                throw new ArgumentException("Invalid Cashier ID: The provided ID is not a valid GUID.");
+            }
+
             List<GetOrderDTO> result = new List<GetOrderDTO>();
 
             foreach (Order order in orders)
@@ -397,6 +429,15 @@ namespace SewingFactory.Services.Service
         // Get order list by customer phone
         private async Task<IEnumerable<GetOrderDTO>> CustomerPhoneFilterAsync(string? inputValue, IEnumerable<Order> orders)
         {
+            // Regular expression for phone number format: ###-####-### or ###-####-####
+            string phonePattern = @"^\d{3}-\d{4}-\d{3}$|^\d{3}-\d{4}-\d{4}$";
+
+            // Validate the input phone number format
+            if (!string.IsNullOrEmpty(inputValue) && !System.Text.RegularExpressions.Regex.IsMatch(inputValue, phonePattern))
+            {
+                throw new FormatException("Invalid phone number format. Please use ###-####-### or ###-####-####.");
+            }
+
             List<GetOrderDTO> result = new List<GetOrderDTO>();
 
             foreach (Order order in orders)
@@ -448,7 +489,7 @@ namespace SewingFactory.Services.Service
                 else
                 {
                     // Handle invalid date format
-                    throw new ArgumentException("Invalid start date format. Please use " + nameof(dateFormat));
+                    throw new ArgumentException("Invalid start date format. Please use " + dateFormat);
                 }
             }
 
@@ -462,7 +503,7 @@ namespace SewingFactory.Services.Service
                 else
                 {
                     // Handle invalid date format
-                    throw new ArgumentException("Invalid end date format. Please use " + nameof(dateFormat));
+                    throw new ArgumentException("Invalid end date format. Please use " + dateFormat);
                 }
             }
 
@@ -524,6 +565,22 @@ namespace SewingFactory.Services.Service
         // Get order list by total amount
         private async Task<List<GetOrderDTO>> GetTotalAmountInRange(string filter, IEnumerable<Order> orders, double? minTotalAmount, double? maxTotalAmount)
         {
+            // Validate the total amount range
+            if (minTotalAmount == null || maxTotalAmount == null)
+            {
+                throw new ArgumentException("Invalid total amount: Both minimum and maximum total amounts must be provided.");
+            }
+
+            if (minTotalAmount < 0 || maxTotalAmount < 0)
+            {
+                throw new ArgumentException("Invalid total amount: Total amounts cannot be negative.");
+            }
+
+            if (minTotalAmount > maxTotalAmount)
+            {
+                throw new ArgumentException("Invalid total amount: Minimum total amount cannot be greater than the maximum total amount.");
+            }
+
             // Create an empty list
             List<GetOrderDTO> result = new List<GetOrderDTO>();
 

@@ -41,7 +41,7 @@ namespace SewingFactory.Controllers
             catch (Exception ex)
             {
 
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, "Invalid input" + ex.Message);
             }
         }
 
@@ -100,7 +100,13 @@ namespace SewingFactory.Controllers
         [Route("search")]
         [SwaggerOperation(
             Summary = "Authorization: Cashier & Order Manager",
-            Description = "Search order list by a filter. Filter list: status, cashier id, customer phone, order date, finish date, total amount"
+            Description = "Search order list by a filter. Filter list: status, cashier id, customer phone, order date, finish date, total amount. Example format: " +
+            "status: Not Started/In Progress/Done, " +
+            "cashier id: 00000000-0000-0000-0000-000000000000, " +
+            "customer phone: ###-####-### or ###-####-####, " +
+            "order date: dd/MM/yyyy, " +
+            "finish date: dd/MM/yyyy, " +
+            "total amount: 1000000"
         )]
         public async Task<ActionResult<IEnumerable<GetOrderDTO>>> SearchOrderList(int pageNumber = 1, int pageSize = 5, string? firstInputValue = null, string? secondInputValue = null, string filter = "status")
         {
@@ -110,7 +116,7 @@ namespace SewingFactory.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(500, "Error: " + ex.Message);
             }
         }
 
