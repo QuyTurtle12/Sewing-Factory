@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
 
 namespace SewingFactory.Services.Service
 {

@@ -1,4 +1,4 @@
-﻿namespace SewingFactory.Services.Dto.UserDto.RespondDto
+﻿namespace SewingFactory.Services.DTOs.UserDto.RespondDto
 {
     /// <summary>
     /// Data Transfer Object for representing a user.

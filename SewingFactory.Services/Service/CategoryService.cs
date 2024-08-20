@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.DTO;
-using SewingFactory.Models.Models;
+using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Repositories.DBContext;
 using SewingFactory.Services.Interface;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace SewingFactory.Services
+namespace SewingFactory.Services.Service
 {
     public class CategoryService : ICategoryService
     {

@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.DTO;
-using SewingFactory.Models.Models;
-using SewingFactory.Repositories.DBContext;
+﻿using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services
 {
@@ -30,5 +24,5 @@ namespace SewingFactory.Services
                 string searchByCategoryName);
     }
 
-        
+
 }

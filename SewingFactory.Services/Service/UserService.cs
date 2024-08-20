@@ -2,10 +2,9 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
-using SewingFactory.Services.Dto.UserDto.RespondDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RespondDto;
 using System.ComponentModel.DataAnnotations;
-using static Microsoft.AspNetCore.Hosting.Internal.HostingApplication;
 
 namespace SewingFactory.Services.Service
 {
@@ -487,10 +486,5 @@ namespace SewingFactory.Services.Service
             return user.Username;
         }
 
-        // Validate if user is existed in database
-        public async Task<bool> IsValidUser(Guid userID)
-        {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.ID == userID) is not null;
-        }
     }
 }

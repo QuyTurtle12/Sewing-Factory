@@ -1,13 +1,8 @@
 ﻿using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Interface;
 using Microsoft.EntityFrameworkCore;
-using SewingFactory.Models.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SewingFactory.Models.DTO;
+using SewingFactory.Models.DTOs;
+using SewingFactory.Models;
+using SewingFactory.Services.Interface;
 
 
 namespace SewingFactory.Services.Service
@@ -91,7 +86,7 @@ namespace SewingFactory.Services.Service
         {
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
-        {
+            {
                 return false;
             }
 

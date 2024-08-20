@@ -1,11 +1,4 @@
-﻿using SewingFactory.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SewingFactory.Services.Dto
+﻿namespace SewingFactory.Models.DTOs
 {
     public class TaskResponseDto
     {

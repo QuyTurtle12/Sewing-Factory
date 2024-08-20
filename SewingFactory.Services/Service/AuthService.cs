@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SewingFactory.Models;
 using SewingFactory.Models.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -60,6 +60,7 @@ namespace SewingFactory.Services.Service
     {
         string GenerateJwtToken(User user);
         ClaimsPrincipal DecodeJwtToken(string token);
+        Guid GetUserIdFromTokenHeader(String? token);
     }
 
     public class TokenService : ITokenService
@@ -152,6 +153,27 @@ namespace SewingFactory.Services.Service
             {
                 throw new SecurityTokenException("Invalid token");
             }
+        }
+
+        public Guid GetUserIdFromTokenHeader(String? token)
+        {
+            // Decode the JWT token and extract claims
+            var principal = DecodeJwtToken(token);
+            var claims = principal.Claims.Select(c => new { c.Type, c.Value }).ToList();
+
+            foreach (var claim in claims)
+            {
+                if (claim.Type == "userId")
+                {
+                    if (Guid.TryParse(claim.Value, out Guid parsedUserID))
+                    {
+                        return parsedUserID;
+                    }
+                    break;
+                }
+            }
+
+            return Guid.Empty;
         }
     }
 

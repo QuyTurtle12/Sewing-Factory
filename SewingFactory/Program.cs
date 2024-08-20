@@ -30,7 +30,13 @@ namespace SewingFactory
             // Register Services in Dependency Injection Container
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IRoleService, RoleService>();
+            builder.Services.AddScoped<UserService>();
+            builder.Services.AddScoped<ValidationService>();
+            builder.Services.AddScoped<AuthService>();
+            builder.Services.AddScoped<TaskService>();
+            builder.Services.AddSingleton<ITokenService, TokenService>();
 
             builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
                 policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
@@ -49,6 +55,9 @@ namespace SewingFactory
             builder.Services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sewing Factory API", Version = "v1" });
+                
+                //Enable annotations
+                c.EnableAnnotations();
 
                 // Add Bearer token support to Swagger
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -80,12 +89,6 @@ namespace SewingFactory
             builder.Services.AddDbContext<DatabaseContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-            builder.Services.AddScoped<UserService>();
-            builder.Services.AddScoped<ValidationService>();
-            builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<TaskService>();
-            builder.Services.AddSingleton<ITokenService, TokenService>();
 
             // Configure AutoMapper
             var mapperConfig = new MapperConfiguration(mc =>
@@ -136,10 +139,13 @@ namespace SewingFactory
                 {
                     foreach (var policy in policies)
                     {
+                        // Create a policy with multiple roles
                         options.AddPolicy(policy.Key, policyBuilder =>
                         {
                             // Add role-based claims requirement
-                            policyBuilder.RequireClaim("roleName", policy.Value);
+                            policyBuilder.RequireAssertion(context =>
+                                context.User.Claims.Any(c =>
+                                    c.Type == "roleName" && policy.Value.Contains(c.Value, StringComparer.OrdinalIgnoreCase)));
 
                             // Add custom requirement
                             policyBuilder.Requirements.Add(new UserStatusRequirement());
@@ -152,20 +158,18 @@ namespace SewingFactory
                 }
             });
 
+
             // Register the authorization handler as scoped
             builder.Services.AddScoped<IAuthorizationHandler, UserStatusHandler>();
 
-
-
-
             var app = builder.Build();
 
-            // Apply pending migrations and seed the database
-            using (var scope = app.Services.CreateScope())
-            {
-                var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
-                dbContext.Database.Migrate(); // Applies pending migrations
-            }
+                // Apply pending migrations and seed the database
+                using (var scope = app.Services.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<DatabaseContext>();
+                    dbContext.Database.Migrate(); // Applies pending migrations
+                }
 
             // Configure the HTTP request pipeline.
             // Configure the HTTP request pipeline.
@@ -185,16 +189,17 @@ namespace SewingFactory
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseRouting();
+                app.UseHttpsRedirection();
+                app.UseStaticFiles();
+                app.UseRouting();
 
-            app.UseCors();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.MapControllers();
+                app.UseCors();
+                app.UseAuthentication();
+                app.UseAuthorization();
+                app.MapControllers();
 
-            app.Run();
+                app.Run();
+            }
+
         }
     }
-}

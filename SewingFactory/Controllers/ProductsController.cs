@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Models.DTO;
-using SewingFactory.Models.Models;
-using SewingFactory.Services;
+using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Interface;
 
 namespace SewingFactory.Controllers
@@ -125,7 +124,7 @@ namespace SewingFactory.Controllers
 
             var newProduct = await _productService.CreateProductAsync(productDTO);
             var category = await _categoryService.GetCategoryByIdAsync(newProduct.CategoryID);
-            return Ok(new {newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status});
+            return Ok(new { newProduct.ID, newProduct.Name, categoryName = category.Name, newProduct.Price, newProduct.Status });
         }
 
         [Authorize(Policy = "Product")]

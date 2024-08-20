@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.DotNet.Scaffolding.Shared.Messaging;
-using SewingFactory.Models.DTO;
-using SewingFactory.Models.Models;
+using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Interface;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SewingFactory.Controllers
 {
@@ -33,6 +29,13 @@ namespace SewingFactory.Controllers
             var categories = await _categoryService.GetCategoriesAsync(pageNumber, pageSize);
             return Ok(categories);
         }
+            if (pageNumber < 1 || pageNumber > pageSize) //Validate page number
+            {
+                return BadRequest("pageNumber must be between 1 and " + pageSize);
+            }
+            var categories = await _categoryService.GetCategoriesAsync(pageNumber, pageSize);
+            return Ok(categories);
+        }
 
         // GET: api/Categories/5
         [HttpGet("{id:guid}")]
@@ -46,7 +49,7 @@ namespace SewingFactory.Controllers
                 return NotFound();
             }
 
-            return Ok(new { category.ID, category.Name});
+            return Ok(new { category.ID, category.Name });
         }
 
         [Authorize(Policy = "Product")]
@@ -91,24 +94,6 @@ namespace SewingFactory.Controllers
         }
 
         [Authorize(Policy = "Product")]
-        // DELETE: api/Categories/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(Guid id)
-        {
-            try
-            {
-                var category = await _categoryService.GetCategoryByIdAsync(id);
-                await _categoryService.DeleteCategoryAsync(id);
-
-                return Ok(new { category.ID, category.Name });
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound();
-            }
-        }
-
-        [Authorize(Policy = "Product")]
         [HttpGet("searchCategory")]
         public async Task<ActionResult<IEnumerable<Category>>> SearchCategory(int pageNumber = 1, int pageSize = 10, string searchTerm = null)
         {
@@ -117,7 +102,7 @@ namespace SewingFactory.Controllers
                 return BadRequest("pageNumber must be between 1 and " + pageSize);
             }
             var categories = await _categoryService.SearchCategory(pageNumber, pageSize, searchTerm);
-            if(categories == null)
+            if (categories == null)
             {
                 return NoContent();
             }

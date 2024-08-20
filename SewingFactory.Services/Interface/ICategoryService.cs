@@ -1,8 +1,5 @@
-﻿using SewingFactory.Models.DTO;
-using SewingFactory.Models.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Interface
 {
