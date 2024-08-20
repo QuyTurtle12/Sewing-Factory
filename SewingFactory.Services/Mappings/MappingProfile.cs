@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using SewingFactory.Models;
-using SewingFactory.Services.Dto.UserDto.RequestDto;
-using SewingFactory.Services.Dto.UserDto.RespondDto;
+using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Services.DTOs.UserDto.RespondDto;
 
 namespace SewingFactory.Services.Mappings
 {

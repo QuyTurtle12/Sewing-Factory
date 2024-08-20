@@ -1,17 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.Features;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.Dto;
 using SewingFactory.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Task = SewingFactory.Models.Task;
-using Microsoft.AspNetCore.Server.IIS.Core;
+using SewingFactory.Models.DTOs;
 
 
 namespace SewingFactory.Services.Service
