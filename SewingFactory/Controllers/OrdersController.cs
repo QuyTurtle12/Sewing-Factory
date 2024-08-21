@@ -82,6 +82,10 @@ namespace SewingFactory.Controllers
         {
             try
             {
+                if (!await _orderService.IsValidOrder(id))
+                {
+                    return BadRequest("Invalid Order ID");
+                }
                 var order = await _orderService.GetOrderDTO(id);
                 return Ok(order);
             }
