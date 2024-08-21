@@ -8,7 +8,7 @@ namespace SewingFactory.Models
         [Key]
         public Guid ID { get; set; } // Primary key
 
-        public Guid OrderID { get; set; }
+        public Guid? OrderID { get; set; }
         public string? Name { get; set; }
         public string? Description { get; set; }
         public double? Status { get; set; }

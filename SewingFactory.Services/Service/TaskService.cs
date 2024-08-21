@@ -112,14 +112,19 @@ namespace SewingFactory.Services.Service
         //Update task information, except status
         public async Task<TaskViewDto> UpdateInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
         {
+
             //Find existing task
             var task = await _dbContext.Tasks.FindAsync(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
+
+            //Check the taskupdatedto have valid request body
+            if (!dto.HasAtLeastOneField()) throw new Exception("Please provide at least one field to update");
+
 
             //Check if the creatorID matches with the creator ID in database
             if (creatorID != task.CreatorID) throw new UnauthorizedAccessException("Unauthorized action detected");
 
             // Update properties
-            if (dto.OrderID != Guid.Empty)
+            if (dto.OrderID != Guid.Empty && dto.OrderID.HasValue)
             {
                 var order = await _dbContext.Orders.FindAsync(dto.OrderID) ?? throw new KeyNotFoundException($"Order with order ID not found.");
                 task.OrderID = dto.OrderID;
@@ -216,7 +221,6 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
 
             if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
-
 
             //Transfer to ViewDto to display objects
             var taskViewDtos = GetMapper(tasks);
@@ -367,7 +371,9 @@ namespace SewingFactory.Services.Service
         {
             if (string.IsNullOrWhiteSpace(groupName)) throw new ArgumentNullException("Search query null");
 
-            var group = await _dbContext.Groups.Where(g => g.Name.ToLower().Trim() == groupName.ToLower().Trim()).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Group not found");
+            var group = await _dbContext.Groups.Where(g => g.Name.ToLower().Trim() == groupName.ToLower().Trim()).FirstOrDefaultAsync();
+
+            if (group is null) return Enumerable.Empty<TaskViewDto>();
 
             if (group.ID == Guid.Empty) throw new KeyNotFoundException($"Group invalid.");
 
