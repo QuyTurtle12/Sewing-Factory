@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SewingFactory.Services.DTOs.UserDto.RequestDto
+namespace SewingFactory.Models.DTOs
 {
     /// <summary>
     /// Data Transfer Object for updating user information.
     /// </summary>
-    public class UpdateDto
+    public class UserUpdateDto
     {
         /// <summary>
         /// Gets or sets the name of the user.

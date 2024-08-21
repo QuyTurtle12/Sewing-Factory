@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Service
 {
@@ -14,7 +14,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Validate the creation DTO
-        public void ValidateCreateUserDto(CreateDto request)
+        public void ValidateCreateUserDto(UserCreateDto request)
         {
             var context = new ValidationContext(request);
             var results = new List<ValidationResult>();
@@ -34,7 +34,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Validate the update DTO
-        public void ValidateUpdateUserDto(Guid id, UpdateDto request)
+        public void ValidateUpdateUserDto(Guid id, UserUpdateDto request)
         {
             var context = new ValidationContext(request);
             var results = new List<ValidationResult>();

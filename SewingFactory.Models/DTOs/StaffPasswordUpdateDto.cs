@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 
-namespace SewingFactory.Services.DTOs.UserDto.RequestDto
+namespace SewingFactory.Models.DTOs
 {
-    public class ChangePasswordForStaffDto
+    public class StaffPasswordUpdateDto
     {
         public required string OldPassword { get; set; }
 

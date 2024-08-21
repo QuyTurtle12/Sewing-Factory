@@ -9,22 +9,22 @@ namespace SewingFactory.Services.Interface
 
         Task<Order> GetOrder(Guid orderID);
 
-        Task<GetOrderDTO> GetOrderDTO(Guid orderID);
+        Task<OrderViewDto> GetOrderDTO(Guid orderID);
 
-        Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize);
+        Task<IEnumerable<OrderViewDto>> GetAllPagedOrderDTOList(int pageNumber, int pageSize);
 
-        Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList();
+        Task<IEnumerable<OrderViewDto>> GetAllOrderDTOList();
 
         Task<bool> IsValidOrder(Guid orderID);
 
-        Task<bool> AddOrder(AddOrderDTO dto, Guid userID);
+        Task<bool> AddOrder(OrderCreateDto dto, Guid userID);
 
-        Task<bool> UpdateOrder(UpdateOrderDTO dto);
+        Task<bool> UpdateOrder(OrderUpdateDto dto);
 
         bool IsValidStatusFormat(string? status);
 
         Task<string?> IsGenerallyValidated(Guid productID, int? quantity, string? CustomerName, string? CustomerPhone);
 
-        Task<IEnumerable<GetOrderDTO>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter);
+        Task<IEnumerable<OrderViewDto>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter);
     }
 }

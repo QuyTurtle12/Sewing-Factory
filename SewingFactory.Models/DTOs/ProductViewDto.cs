@@ -1,6 +1,6 @@
 ﻿namespace SewingFactory.Models.DTOs
 {
-    public class ProductDetailsDTO
+    public class ProductViewDto
     {
         public Guid ID { get; set; }
         public string Name { get; set; }

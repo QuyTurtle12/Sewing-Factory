@@ -1,6 +1,6 @@
 ﻿namespace SewingFactory.Models.DTOs
 {
-    public class GetOrderDTO
+    public class OrderViewDto
     {
         public DateTime? OrderDate { get; set; }
         public DateTime? FinishedDate { get; set; }

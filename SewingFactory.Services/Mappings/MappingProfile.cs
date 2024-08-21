@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using SewingFactory.Models;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
-using SewingFactory.Services.DTOs.UserDto.RespondDto;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Mappings
 {
@@ -10,7 +9,7 @@ namespace SewingFactory.Services.Mappings
         public MappingProfile()
         {
             // Mapping configuration for User to UserDto
-            CreateMap<User, UserDto>()
+            CreateMap<User, UserViewDto>()
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => new RoleDto
                 {
                     RoleID = src.Role.ID,         // Map RoleID from User's Role entity
@@ -24,12 +23,12 @@ namespace SewingFactory.Services.Mappings
 
             // Mapping configuration for CreateDto to User
             // Hashes the password before mapping
-            CreateMap<CreateDto, User>()
+            CreateMap<UserCreateDto, User>()
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
 
             // Mapping configuration for UpdateDto to User
             // Hashes the password if it's provided in the update request
-            CreateMap<UpdateDto, User>()
+            CreateMap<UserUpdateDto, User>()
                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => src.Password != null ? BCrypt.Net.BCrypt.HashPassword(src.Password) : null));
         }
     }

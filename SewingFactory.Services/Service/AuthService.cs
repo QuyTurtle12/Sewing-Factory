@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using SewingFactory.Models;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Models.DTOs;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -29,7 +29,7 @@ namespace SewingFactory.Services.Service
         /// </summary>
         /// <param name="loginDto">The login credentials.</param>
         /// <returns>A JWT token if authentication is successful.</returns>
-        public async Task<string> LoginAsync(LoginDto loginDto)
+        public async Task<string> LoginAsync(UserLoginDto loginDto)
         {
             // Retrieve the user from the database based on the provided username
             var user = await _dbContext.Users

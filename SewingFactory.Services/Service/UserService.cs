@@ -1,9 +1,8 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using SewingFactory.Models;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
-using SewingFactory.Services.DTOs.UserDto.RespondDto;
 using System.ComponentModel.DataAnnotations;
 
 namespace SewingFactory.Services.Service
@@ -26,14 +25,14 @@ namespace SewingFactory.Services.Service
         /// Retrieves all users from the database including their roles and groups.
         /// </summary>
         /// <returns>A list of UserDto objects.</returns>
-        public async Task<List<UserDto>> GetAllUsersAsync()
+        public async Task<List<UserViewDto>> GetAllUsersAsync()
         {
             var users = await _dbContext.Users
                 .Include(u => u.Role)
                 .Include(u => u.Group)
                 .ToListAsync();
 
-            return _mapper.Map<List<UserDto>>(users);
+            return _mapper.Map<List<UserViewDto>>(users);
         }
 
         /// <summary>
@@ -42,7 +41,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of UserDto objects and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> GetPagedUsersAsync(int pageNumber, int pageSize)
         {
             var totalCount = await _dbContext.Users.CountAsync();
 
@@ -53,7 +52,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
 
@@ -62,7 +61,7 @@ namespace SewingFactory.Services.Service
         /// </summary>
         /// <param name="id">The ID of the user to retrieve.</param>
         /// <returns>A UserDto object representing the user.</returns>
-        public async Task<UserDto> GetUserByIdAsync(Guid id)
+        public async Task<UserViewDto> GetUserByIdAsync(Guid id)
         {
             var user = await _dbContext.Users
                 .Include(u => u.Role)
@@ -70,7 +69,7 @@ namespace SewingFactory.Services.Service
                 .FirstOrDefaultAsync(u => u.ID == id)
                 ?? throw new KeyNotFoundException($"User with ID '{id}' not found.");
 
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserViewDto>(user);
         }
 
         /// <summary>
@@ -79,7 +78,7 @@ namespace SewingFactory.Services.Service
         /// <param name="id">The ID of the user to update.</param>
         /// <param name="request">The update details.</param>
         /// <returns>The updated UserDto object.</returns>
-        public async Task<UserDto> UpdateUserAsync(Guid id, UpdateDto request)
+        public async Task<UserViewDto> UpdateUserAsync(Guid id, UserUpdateDto request)
         {
             var user = await _dbContext.Users
                 .Include(u => u.Role)
@@ -133,7 +132,7 @@ namespace SewingFactory.Services.Service
             _dbContext.Users.Update(user);
             await _dbContext.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserViewDto>(user);
         }
 
         /// <summary>
@@ -141,7 +140,7 @@ namespace SewingFactory.Services.Service
         /// </summary>
         /// <param name="createUser">The user creation details.</param>
         /// <returns>The created UserDto object.</returns>
-        public async Task<UserDto> CreateUserAsync(CreateDto createUser)
+        public async Task<UserViewDto> CreateUserAsync(UserCreateDto createUser)
         {
             if (createUser == null) throw new ArgumentNullException(nameof(createUser));
 
@@ -156,7 +155,7 @@ namespace SewingFactory.Services.Service
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync();
 
-            return _mapper.Map<UserDto>(user);
+            return _mapper.Map<UserViewDto>(user);
         }
 
         /// <summary>
@@ -165,7 +164,7 @@ namespace SewingFactory.Services.Service
         /// <param name="id">The ID of the user to update.</param>
         /// <param name="statusDto">The status update details.</param>
         /// <returns>The updated UserDto object.</returns>
-        public async Task<UserDto> UpdateUserStatusAsync(Guid id, UpdateUserStatusDto statusDto)
+        public async Task<UserViewDto> UpdateUserStatusAsync(Guid id, UserStatusUpdateDto statusDto)
         {
             var user = await _dbContext.Users
                 .Include(u => u.Role)
@@ -179,7 +178,7 @@ namespace SewingFactory.Services.Service
             await _dbContext.SaveChangesAsync();
 
             // Create a UserDto and set the role and group names manually
-            var userDto = _mapper.Map<UserDto>(user);
+            var userDto = _mapper.Map<UserViewDto>(user);
 
             return userDto;
         }
@@ -190,7 +189,7 @@ namespace SewingFactory.Services.Service
             public string? Message { get; set; }
         }
 
-        public async Task<ChangePasswordResult> ChangePasswordForStaff(Guid id, ChangePasswordForStaffDto request)
+        public async Task<ChangePasswordResult> ChangePasswordForStaff(Guid id, StaffPasswordUpdateDto request)
         {
             if (request == null) throw new ArgumentNullException(nameof(request));
 
@@ -253,7 +252,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of UserDto objects and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> SearchUsersAsync(
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> SearchUsersAsync(
             string? name,
             string? username,
             bool? status,
@@ -328,7 +327,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
 
@@ -342,7 +341,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of UserDto objects and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetUsersByNameAsync(string? name, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> GetUsersByNameAsync(string? name, int pageNumber, int pageSize)
         {
             var query = _dbContext.Users.AsQueryable();
 
@@ -361,7 +360,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
         /// <summary>
@@ -371,7 +370,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of UserDto objects and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetUsersByStatusAsync(bool status, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> GetUsersByStatusAsync(bool status, int pageNumber, int pageSize)
         {
             var totalCount = await _dbContext.Users
                 .Where(u => u.Status == status)
@@ -385,7 +384,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
         /// <summary>
@@ -397,7 +396,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of users and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetUsersByRoleAndGroupNameAsync(
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> GetUsersByRoleAndGroupNameAsync(
             string? roleName,
             string? groupName,
             int pageNumber,
@@ -428,7 +427,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
         /// <summary>
@@ -440,7 +439,7 @@ namespace SewingFactory.Services.Service
         /// <param name="pageNumber">The page number to retrieve.</param>
         /// <param name="pageSize">The number of users per page.</param>
         /// <returns>A tuple containing a paginated list of users and the total count of users.</returns>
-        public async Task<(IEnumerable<UserDto> Users, int TotalCount)> GetUsersByRoleAndGroupAsync(Guid? roleId, Guid? groupId, int pageNumber, int pageSize)
+        public async Task<(IEnumerable<UserViewDto> Users, int TotalCount)> GetUsersByRoleAndGroupAsync(Guid? roleId, Guid? groupId, int pageNumber, int pageSize)
         {
             var query = _dbContext.Users.AsQueryable();
 
@@ -463,7 +462,7 @@ namespace SewingFactory.Services.Service
                 .Take(pageSize)
                 .ToListAsync();
 
-            return (_mapper.Map<IEnumerable<UserDto>>(users), totalCount);
+            return (_mapper.Map<IEnumerable<UserViewDto>>(users), totalCount);
         }
 
         /// <summary>
