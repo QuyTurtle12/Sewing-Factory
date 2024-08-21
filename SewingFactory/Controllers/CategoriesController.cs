@@ -120,25 +120,5 @@ namespace SewingFactory.Controllers
 
             return Ok(categories);
         }
-
-        [Authorize(Policy = "Product")]
-        // DELETE: api/Categories/5
-        [HttpDelete("{id:guid}")]
-        [SwaggerOperation(
-            Summary = "Authorization: Product Manager",
-            Description = "Delete a category by ID"
-        )]
-        public async Task<IActionResult> DeleteCategory(Guid id)
-        {
-            try
-            {
-                await _categoryService.DeleteCategoryAsync(id);
-                return NoContent();
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-        }
     }
 }
