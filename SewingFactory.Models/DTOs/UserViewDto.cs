@@ -1,9 +1,9 @@
-﻿namespace SewingFactory.Services.DTOs.UserDto.RespondDto
+﻿namespace SewingFactory.Models.DTOs
 {
     /// <summary>
     /// Data Transfer Object for representing a user.
     /// </summary>
-    public class UserDto
+    public class UserViewDto
     {
         public Guid ID { get; set; }
         public string? Name { get; set; }

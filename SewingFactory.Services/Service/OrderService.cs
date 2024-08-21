@@ -22,7 +22,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Add a new order to database
-        public async Task<bool> AddOrder(AddOrderDTO dto, Guid userID)
+        public async Task<bool> AddOrder(OrderCreateDto dto, Guid userID)
         {
             var product = await _productService.GetProductAsync(dto.ProductID);
             double? totalAmount = product.Price * dto.Quantity;
@@ -47,16 +47,16 @@ namespace SewingFactory.Services.Service
         }
 
         // Show all orders info at human view point
-        public async Task<IEnumerable<GetOrderDTO>> GetAllPagedOrderDTOList(int pageNumber, int pageSize)
+        public async Task<IEnumerable<OrderViewDto>> GetAllPagedOrderDTOList(int pageNumber, int pageSize)
         {
             try
             {
                 IEnumerable<Order> orderList = await GetOrderList();
-                var orderDtos = new List<GetOrderDTO>();
+                var orderDtos = new List<OrderViewDto>();
 
                 foreach (var order in orderList)
                 {
-                    var orderDTO = new GetOrderDTO
+                    var orderDTO = new OrderViewDto
                     {
                         OrderDate = DateTime.Now,
                         FinishedDate = order.FinishedDate,
@@ -71,7 +71,7 @@ namespace SewingFactory.Services.Service
                     orderDtos.Add(orderDTO);
                 }
 
-                var orderPaginationList = new PaginatedList<GetOrderDTO>(orderDtos, pageNumber, pageSize);
+                var orderPaginationList = new PaginatedList<OrderViewDto>(orderDtos, pageNumber, pageSize);
 
                 return orderPaginationList.GetPaginatedItems();
             }
@@ -87,14 +87,14 @@ namespace SewingFactory.Services.Service
             
         }
 
-        public async Task<IEnumerable<GetOrderDTO>> GetAllOrderDTOList()
+        public async Task<IEnumerable<OrderViewDto>> GetAllOrderDTOList()
         {
             IEnumerable<Order> orderList = await GetOrderList();
-            var orderDtos = new List<GetOrderDTO>();
+            var orderDtos = new List<OrderViewDto>();
 
             foreach (var order in orderList)
             {
-                var orderDTO = new GetOrderDTO
+                var orderDTO = new OrderViewDto
                 {
                     OrderDate = DateTime.Now,
                     FinishedDate = order.FinishedDate,
@@ -120,12 +120,12 @@ namespace SewingFactory.Services.Service
         }
 
         // Show order info at human view point
-        public async Task<GetOrderDTO> GetOrderDTO(Guid orderID)
+        public async Task<OrderViewDto> GetOrderDTO(Guid orderID)
         {
             var order = await GetOrder(orderID);
 
             // Transfer order data to showable data at human view-point
-            GetOrderDTO orderDTO = new GetOrderDTO()
+            OrderViewDto orderDTO = new OrderViewDto()
             {
                 OrderDate = DateTime.Now,
                 FinishedDate = order.FinishedDate,
@@ -224,7 +224,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Get a list of order by a specific filter
-        public async Task<IEnumerable<GetOrderDTO>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter)
+        public async Task<IEnumerable<OrderViewDto>> searchOrderDTOList(int pageNumber, int pageSize, string? firstInputValue, string? secondInputValue, string filter)
         {
             try
             {
@@ -236,7 +236,7 @@ namespace SewingFactory.Services.Service
                 secondInputValue = secondInputValue?.Trim() ?? null;
 
                 // Create an empty list
-                IEnumerable<GetOrderDTO> result = new List<GetOrderDTO>();
+                IEnumerable<OrderViewDto> result = new List<OrderViewDto>();
 
                 // variable for using only one input
                 string? inputValue = string.Empty;
@@ -273,7 +273,7 @@ namespace SewingFactory.Services.Service
                         throw new ArgumentException($"Invalid {nameof(filter)}: {filter}. Allowed filters are 'status', 'cashier id', 'customer phone', 'order date', 'finish date', 'total amount'.");
                 }
                 // Create a new PaginatedList object, which handles the pagination logic for the results.
-                var orderPaginationList = new PaginatedList<GetOrderDTO>(result, pageNumber, pageSize);
+                var orderPaginationList = new PaginatedList<OrderViewDto>(result, pageNumber, pageSize);
 
                 // Retrieve the paginated items from the PaginatedList.
                 return orderPaginationList.GetPaginatedItems();
@@ -298,9 +298,9 @@ namespace SewingFactory.Services.Service
         }
 
         // Get order list by status
-        private async Task<IEnumerable<GetOrderDTO>> StatusFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        private async Task<IEnumerable<OrderViewDto>> StatusFilterAsync(string? inputValue, IEnumerable<Order> orders)
         {
-            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            List<OrderViewDto> result = new List<OrderViewDto>();
             switch (inputValue)
             {
                 case "Not Started":
@@ -312,7 +312,7 @@ namespace SewingFactory.Services.Service
                             continue; // Skip the whole code below and move to next iteration
                         }
                         // Transfer entity data to dto value that human understand
-                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        OrderViewDto orderDTO = new OrderViewDto()
                         {
                             OrderDate = DateTime.Now,
                             FinishedDate = order.FinishedDate,
@@ -338,7 +338,7 @@ namespace SewingFactory.Services.Service
                         }
 
                         // Transfer entity data to dto value that human understand
-                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        OrderViewDto orderDTO = new OrderViewDto()
                         {
                             OrderDate = DateTime.Now,
                             FinishedDate = order.FinishedDate,
@@ -365,7 +365,7 @@ namespace SewingFactory.Services.Service
                         }
 
                         // Transfer entity data to dto value that human understand
-                        GetOrderDTO orderDTO = new GetOrderDTO()
+                        OrderViewDto orderDTO = new OrderViewDto()
                         {
                             OrderDate = DateTime.Now,
                             FinishedDate = order.FinishedDate,
@@ -388,7 +388,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Get order list by cashier id
-        private async Task<IEnumerable<GetOrderDTO>> CashierIDFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        private async Task<IEnumerable<OrderViewDto>> CashierIDFilterAsync(string? inputValue, IEnumerable<Order> orders)
         {
             // Validate the input value
             if (string.IsNullOrWhiteSpace(inputValue) || !Guid.TryParse(inputValue, out Guid cashierID))
@@ -396,7 +396,7 @@ namespace SewingFactory.Services.Service
                 throw new ArgumentException("Invalid Cashier ID: The provided ID is not a valid GUID.");
             }
 
-            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            List<OrderViewDto> result = new List<OrderViewDto>();
 
             foreach (Order order in orders)
             {
@@ -407,7 +407,7 @@ namespace SewingFactory.Services.Service
                 }
 
                 // Transfer entity data to dto value that human understand
-                GetOrderDTO orderDTO = new GetOrderDTO()
+                OrderViewDto orderDTO = new OrderViewDto()
                 {
                     OrderDate = DateTime.Now,
                     FinishedDate = order.FinishedDate,
@@ -427,7 +427,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Get order list by customer phone
-        private async Task<IEnumerable<GetOrderDTO>> CustomerPhoneFilterAsync(string? inputValue, IEnumerable<Order> orders)
+        private async Task<IEnumerable<OrderViewDto>> CustomerPhoneFilterAsync(string? inputValue, IEnumerable<Order> orders)
         {
             // Regular expression for phone number format: ###-####-### or ###-####-####
             string phonePattern = @"^\d{3}-\d{4}-\d{3}$|^\d{3}-\d{4}-\d{4}$";
@@ -438,7 +438,7 @@ namespace SewingFactory.Services.Service
                 throw new FormatException("Invalid phone number format. Please use ###-####-### or ###-####-####.");
             }
 
-            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            List<OrderViewDto> result = new List<OrderViewDto>();
 
             foreach (Order order in orders)
             {
@@ -450,7 +450,7 @@ namespace SewingFactory.Services.Service
                 }
 
                 // Transfer entity data to dto value that human understand
-                GetOrderDTO orderDTO = new GetOrderDTO()
+                OrderViewDto orderDTO = new OrderViewDto()
                 {
                     OrderDate = DateTime.Now,
                     FinishedDate = order.FinishedDate,
@@ -470,7 +470,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Get order list by date
-        private async Task<IEnumerable<GetOrderDTO>> DateFilterAsync(string? startDate, string? endDate, string filter, IEnumerable<Order> orders)
+        private async Task<IEnumerable<OrderViewDto>> DateFilterAsync(string? startDate, string? endDate, string filter, IEnumerable<Order> orders)
         {
             // Define the date format
             string dateFormat = "dd/MM/yyyy";
@@ -508,7 +508,7 @@ namespace SewingFactory.Services.Service
             }
 
             // Create an empty list
-            IEnumerable<GetOrderDTO> result = new List<GetOrderDTO>();
+            IEnumerable<OrderViewDto> result = new List<OrderViewDto>();
 
             result = await GetDateInRange(filter, orders, startDateParsed, endDateParsed);
 
@@ -517,9 +517,9 @@ namespace SewingFactory.Services.Service
 
         // Encapsulate get order list by date process
         // Interact with database in here
-        private async Task<List<GetOrderDTO>> GetDateInRange(string filter, IEnumerable<Order> orders, DateTime? startDateParsed, DateTime? endDateParsed)
+        private async Task<List<OrderViewDto>> GetDateInRange(string filter, IEnumerable<Order> orders, DateTime? startDateParsed, DateTime? endDateParsed)
         {
-            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            List<OrderViewDto> result = new List<OrderViewDto>();
 
             foreach (Order order in orders)
             {
@@ -535,7 +535,7 @@ namespace SewingFactory.Services.Service
                 }
 
                 // Transfer entity data to DTO
-                GetOrderDTO orderDTO = new GetOrderDTO
+                OrderViewDto orderDTO = new OrderViewDto
                 {
                     OrderDate = order.OrderDate,
                     FinishedDate = order.FinishedDate,
@@ -563,7 +563,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Get order list by total amount
-        private async Task<List<GetOrderDTO>> GetTotalAmountInRange(string filter, IEnumerable<Order> orders, double? minTotalAmount, double? maxTotalAmount)
+        private async Task<List<OrderViewDto>> GetTotalAmountInRange(string filter, IEnumerable<Order> orders, double? minTotalAmount, double? maxTotalAmount)
         {
             // Validate the total amount range
             if (minTotalAmount == null || maxTotalAmount == null)
@@ -582,7 +582,7 @@ namespace SewingFactory.Services.Service
             }
 
             // Create an empty list
-            List<GetOrderDTO> result = new List<GetOrderDTO>();
+            List<OrderViewDto> result = new List<OrderViewDto>();
 
             foreach (Order order in orders)
             {
@@ -593,7 +593,7 @@ namespace SewingFactory.Services.Service
                 }
 
                 // Transfer entity data to DTO value
-                GetOrderDTO orderDTO = new GetOrderDTO()
+                OrderViewDto orderDTO = new OrderViewDto()
                 {
                     OrderDate = order.OrderDate,
                     FinishedDate = order.FinishedDate,
@@ -626,7 +626,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Update status to existed order
-        public async Task<bool> UpdateOrder(UpdateOrderDTO dto)
+        public async Task<bool> UpdateOrder(OrderUpdateDto dto)
         {
             var order = await GetOrder(dto.ID);
             if (order is null) { return false; }

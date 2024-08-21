@@ -24,7 +24,7 @@ namespace SewingFactory.Services.Service
         }
 
         //Get all tasks
-        public async Task<IEnumerable<TaskResponseDto>> GetAll(int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> GetAll(int pageNumber, int pageSize)
         {
             var tasks = await _dbContext.Tasks
                 .Include(t => t.Order)
@@ -32,16 +32,16 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
         }
 
         //Get all tasks (No-pagination view)
-        public async Task<IEnumerable<TaskResponseDto>> GetAll()
+        public async Task<IEnumerable<TaskViewDto>> GetAll()
         {
 
             var tasks = await _dbContext.Tasks
@@ -50,14 +50,14 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            return taskResponseDtos;
+            return taskViewDtos;
         }
 
         //Get task by id
-        public async Task<TaskResponseDto> GetById(Guid id)
+        public async Task<TaskViewDto> GetById(Guid id)
         {
             var task = await _dbContext.Tasks
                 .Include(t => t.Order)
@@ -66,14 +66,14 @@ namespace SewingFactory.Services.Service
                 .FirstOrDefaultAsync(t => t.ID == id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
 
             //define the dto from object
-            var taskResponseDto = GetMapper(task);
+            var taskViewDto = GetMapper(task);
 
-            return taskResponseDto;
+            return taskViewDto;
 
         }
 
         //Create task, status, created date and deadline excluded
-        public async Task<TaskResponseDto> Create(Guid creatorID, TaskCreateDto dto)
+        public async Task<TaskViewDto> Create(Guid creatorID, TaskCreateDto dto)
         {
             var order = await _dbContext.Orders.FindAsync(dto.OrderID) ?? throw new KeyNotFoundException($"Order with order ID not found.");
             if (dto.GroupID == Guid.Empty) throw new KeyNotFoundException($"Group with group ID invalid.");
@@ -103,14 +103,14 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
-            //define responsedto from the object
-            var taskResponseDto = GetMapper(task);
+            //define ViewDto from the object
+            var taskViewDto = GetMapper(task);
 
-            return taskResponseDto;
+            return taskViewDto;
         }
 
         //Update task information, except status
-        public async Task<TaskResponseDto> UpdateInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
+        public async Task<TaskViewDto> UpdateInfo(Guid id, Guid creatorID, TaskUpdateDto dto)
         {
             //Find existing task
             var task = await _dbContext.Tasks.FindAsync(id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
@@ -153,14 +153,14 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
-            var taskResponseDto = GetMapper(getTask);
+            var taskViewDto = GetMapper(getTask);
 
-            return taskResponseDto;
+            return taskViewDto;
 
         }
 
         //Update task status
-        public async Task<TaskResponseDto> UpdateStatus(Guid id, Guid staffID, double? status)
+        public async Task<TaskViewDto> UpdateStatus(Guid id, Guid staffID, double? status)
         {
             //Find existing task
             var task = await _dbContext.Tasks.Include(t => t.Group).FirstOrDefaultAsync(t => t.ID == id) ?? throw new KeyNotFoundException($"Task with ID '{id}' not found.");
@@ -188,9 +188,9 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .FirstOrDefaultAsync(t => t.ID == task.ID);
 
-            var taskResponseDto = GetMapper(getTask);
+            var taskViewDto = GetMapper(getTask);
 
-            return taskResponseDto;
+            return taskViewDto;
         }
 
         public void Delete(Guid id, Guid creatorID)
@@ -204,7 +204,7 @@ namespace SewingFactory.Services.Service
             _dbContext.SaveChanges();
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByOrderID(Guid orderID, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByOrderID(Guid orderID, int pageNumber, int pageSize)
         {
             var order = await _dbContext.Orders.FindAsync(orderID) ?? throw new KeyNotFoundException($"Order with ID '{orderID}' not found.");
 
@@ -215,19 +215,19 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByName(string? searchQuery, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByName(string? searchQuery, int pageNumber, int pageSize)
         {
             if (string.IsNullOrWhiteSpace(searchQuery)) throw new ArgumentNullException("Search query null");
 
@@ -238,17 +238,17 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByStatus(double min, double max, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByStatus(double min, double max, int pageNumber, int pageSize)
         {
             if (min > max) throw new Exception("Min value is higher than max value");
 
@@ -259,18 +259,18 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatorID(Guid creatorID, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByCreatorID(Guid creatorID, int pageNumber, int pageSize)
         {
             var user = await _dbContext.Users.FindAsync(creatorID) ?? throw new KeyNotFoundException($"Creator with ID '{creatorID}' not found.");
 
@@ -281,19 +281,19 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByCreatedDate(string min, string max, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByCreatedDate(string min, string max, int pageNumber, int pageSize)
         {
             DateOnly startDateOnly;
             bool success = DateOnly.TryParseExact(min, "yyyy-MM-dd", out startDateOnly); // Try to parse the string to DateOnly
@@ -317,18 +317,18 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByDeadline(string min, string max, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByDeadline(string min, string max, int pageNumber, int pageSize)
         {
             DateOnly startDateOnly;
             bool success = DateOnly.TryParseExact(min, "yyyy-MM-dd", out startDateOnly); // Try to parse the string to DateOnly
@@ -352,18 +352,18 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
 
         }
 
-        public async Task<IEnumerable<TaskResponseDto>> SearchByGroupName(string? groupName, int pageNumber, int pageSize)
+        public async Task<IEnumerable<TaskViewDto>> SearchByGroupName(string? groupName, int pageNumber, int pageSize)
         {
             if (string.IsNullOrWhiteSpace(groupName)) throw new ArgumentNullException("Search query null");
 
@@ -379,19 +379,19 @@ namespace SewingFactory.Services.Service
                 .Include(t => t.Group)
                 .ToListAsync();
 
-            if (!tasks.Any()) return Enumerable.Empty<TaskResponseDto>();
+            if (!tasks.Any()) return Enumerable.Empty<TaskViewDto>();
 
-            //Transfer to responseDto to display objects
-            var taskResponseDtos = GetMapper(tasks);
+            //Transfer to ViewDto to display objects
+            var taskViewDtos = GetMapper(tasks);
 
-            var taskPaginatedList = new PaginatedList<TaskResponseDto>(taskResponseDtos, pageNumber, pageSize);
+            var taskPaginatedList = new PaginatedList<TaskViewDto>(taskViewDtos, pageNumber, pageSize);
 
             return taskPaginatedList.GetPaginatedItems();
         }
 
-        public TaskResponseDto GetMapper(Task task)
+        public TaskViewDto GetMapper(Task task)
         {
-            var taskResponseDto = new TaskResponseDto
+            var taskViewDto = new TaskViewDto
             {
                 ID = task.ID,
                 OrderID = task.OrderID,
@@ -404,12 +404,12 @@ namespace SewingFactory.Services.Service
                 GroupName = task.Group?.Name
             };
 
-            return taskResponseDto;
+            return taskViewDto;
         }
 
-        public IEnumerable<TaskResponseDto> GetMapper(IEnumerable<Task> tasks)
+        public IEnumerable<TaskViewDto> GetMapper(IEnumerable<Task> tasks)
         {
-            var taskResponseDtos = tasks.Select(t => new TaskResponseDto
+            var taskViewDtos = tasks.Select(t => new TaskViewDto
             {
                 ID = t.ID,
                 OrderID = t.OrderID,
@@ -423,7 +423,7 @@ namespace SewingFactory.Services.Service
 
             });
 
-            return taskResponseDtos;
+            return taskViewDtos;
         }
 
     }

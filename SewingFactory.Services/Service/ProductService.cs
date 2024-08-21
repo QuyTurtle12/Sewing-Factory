@@ -77,14 +77,14 @@ namespace SewingFactory.Services.Service
                 .ToListAsync();
         }
 
-        public async Task<ProductDetailsDTO> GetProductAsync(Guid id)
+        public async Task<ProductViewDto> GetProductAsync(Guid id)
         {
             var product = await _context.Products
                 .Join(
                     _context.Categories,
                     product => product.CategoryID,
                     category => category.ID,
-                    (product, category) => new ProductDetailsDTO
+                    (product, category) => new ProductViewDto
                     {
                         ID = product.ID,
                         Name = product.Name,
@@ -109,7 +109,7 @@ namespace SewingFactory.Services.Service
             return product.Name;
         }
 
-        public async Task<bool> UpdateProductAsync(Guid id, ProductDTO productDTO)
+        public async Task<bool> UpdateProductAsync(Guid id, ProductDto productDTO)
         {
             var existingProduct = await _context.Products.FindAsync(id);
             if (existingProduct == null)
@@ -138,7 +138,7 @@ namespace SewingFactory.Services.Service
             return true;
         }
 
-        public async Task<Product> CreateProductAsync(ProductDTO productDTO)
+        public async Task<Product> CreateProductAsync(ProductDto productDTO)
         {
             if (string.IsNullOrWhiteSpace(productDTO.Name))
             {
@@ -187,7 +187,7 @@ namespace SewingFactory.Services.Service
             return await _context.Categories.AnyAsync(e => e.ID == id);
         }
 
-        public async Task<IEnumerable<ProductDetailsDTO>> SearchProduct(
+        public async Task<IEnumerable<ProductViewDto>> SearchProduct(
                 int pageNumber,
                 int pageSize,
                 string searchByName,
@@ -233,7 +233,7 @@ namespace SewingFactory.Services.Service
             return await query
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)
-                .Select(p => new ProductDetailsDTO
+                .Select(p => new ProductViewDto
                 {
                     ID = p.product.ID,
                     Name = p.product.Name,

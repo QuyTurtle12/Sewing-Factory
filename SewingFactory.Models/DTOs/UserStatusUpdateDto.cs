@@ -1,11 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace SewingFactory.Services.DTOs.UserDto.RequestDto
+namespace SewingFactory.Models.DTOs
 {
     /// <summary>
     /// Data Transfer Object for updating the status of a user.
     /// </summary>
-    public class UpdateUserStatusDto
+    public class UserStatusUpdateDto
     {
         /// <summary>
         /// Gets or sets the status of the user.

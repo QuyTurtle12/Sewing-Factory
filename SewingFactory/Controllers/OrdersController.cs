@@ -31,11 +31,11 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Cashier & Order Manager",
             Description = "View order list in a page"
         )]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetOrdersInPage(int pageNumber = 1, int pageSize = 5)
+        public async Task<ActionResult<IEnumerable<OrderViewDto>>> GetOrdersInPage(int pageNumber = 1, int pageSize = 5)
         {
             try
             {
-                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllPagedOrderDTOList(pageNumber, pageSize);
+                IEnumerable<OrderViewDto> orderList = await _orderService.GetAllPagedOrderDTOList(pageNumber, pageSize);
                 return Ok(orderList);
             }
             catch (Exception ex)
@@ -54,11 +54,11 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Cashier & Order Manager",
             Description = "View order list"
         )]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> GetAllOrders()
+        public async Task<ActionResult<IEnumerable<OrderViewDto>>> GetAllOrders()
         {
             try
             {
-                IEnumerable<GetOrderDTO> orderList = await _orderService.GetAllOrderDTOList();
+                IEnumerable<OrderViewDto> orderList = await _orderService.GetAllOrderDTOList();
                 return Ok(orderList);
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Cashier & Order Manager",
             Description = "View an order by order id"
         )]
-        public async Task<ActionResult<GetOrderDTO>> GetOrder(Guid id)
+        public async Task<ActionResult<OrderViewDto>> GetOrder(Guid id)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace SewingFactory.Controllers
             "finish date: dd/MM/yyyy, " +
             "total amount: 1000000"
         )]
-        public async Task<ActionResult<IEnumerable<GetOrderDTO>>> SearchOrderList(int pageNumber = 1, int pageSize = 5, string? firstInputValue = null, string? secondInputValue = null, string filter = "status")
+        public async Task<ActionResult<IEnumerable<OrderViewDto>>> SearchOrderList(int pageNumber = 1, int pageSize = 5, string? firstInputValue = null, string? secondInputValue = null, string filter = "status")
         {
             try
             {
@@ -133,7 +133,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Cashier",
             Description = "Add order"
         )]
-        public async Task<ActionResult<Order>> AddOrder(AddOrderDTO orderDTO)
+        public async Task<ActionResult<Order>> AddOrder(OrderCreateDto orderDTO)
         {
             try
             {
@@ -190,7 +190,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager",
             Description = "Update Order Status"
         )]
-        public async Task<ActionResult<Order>> UpdateOrder(UpdateOrderDTO orderDTO)
+        public async Task<ActionResult<Order>> UpdateOrder(OrderUpdateDto orderDTO)
         {
             try
             {

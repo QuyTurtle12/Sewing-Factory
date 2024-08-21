@@ -1,6 +1,6 @@
 ﻿namespace SewingFactory.Models.DTOs
 {
-    public class TaskResponseDto
+    public class TaskViewDto
     {
         public Guid ID { get; set; }
         public Guid OrderID { get; set; }

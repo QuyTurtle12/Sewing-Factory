@@ -49,7 +49,7 @@ namespace SewingFactory.Services.Service
             return await _context.Categories.AnyAsync(e => e.ID == id);
         }
 
-        public async Task<Category> CreateCategoryAsync(CategoryDTO categoryDTO)
+        public async Task<Category> CreateCategoryAsync(CategoryDto categoryDTO)
         {
             if (string.IsNullOrWhiteSpace(categoryDTO.Name))
             {
@@ -69,7 +69,7 @@ namespace SewingFactory.Services.Service
             return newCategory;
         }
 
-        public async System.Threading.Tasks.Task UpdateCategoryAsync(Guid id, CategoryDTO categoryDTO)
+        public async System.Threading.Tasks.Task UpdateCategoryAsync(Guid id, CategoryDto categoryDTO)
         {
             if (string.IsNullOrWhiteSpace(categoryDTO.Name))
             {
