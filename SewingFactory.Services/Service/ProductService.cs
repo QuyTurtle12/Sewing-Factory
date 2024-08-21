@@ -123,6 +123,11 @@ namespace SewingFactory.Services.Service
                 throw new KeyNotFoundException($"Category with ID '{productDTO.CategoryID}' not found.");
             }
 
+            if (productDTO.Price <= 0)
+            {
+                throw new ArgumentException("Product price must greater than 0.");
+            }
+
             existingProduct.Name = productDTO.Name;
             existingProduct.CategoryID = productDTO.CategoryID;
             existingProduct.Price = productDTO.Price;
@@ -144,6 +149,11 @@ namespace SewingFactory.Services.Service
             if (!categoryExists)
             {
                 throw new KeyNotFoundException($"Category with ID '{productDTO.CategoryID}' not found.");
+            }
+
+            if (productDTO.Price <= 0)
+            {
+                throw new ArgumentException("Product price must greater than 0.");
             }
 
             Product newProduct = new Product(productDTO.Name, productDTO.CategoryID, productDTO.Price);

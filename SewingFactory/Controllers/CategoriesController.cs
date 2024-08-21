@@ -7,7 +7,6 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace SewingFactory.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
     public class CategoriesController : ControllerBase
     {
