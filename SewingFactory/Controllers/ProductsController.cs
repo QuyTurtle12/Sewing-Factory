@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SewingFactory.Models;
 using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Interface;
+using SewingFactory.Services.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace SewingFactory.Controllers
@@ -16,8 +17,8 @@ namespace SewingFactory.Controllers
 
         public ProductsController(IProductService productService, ICategoryService categoryService)
         {
-            _productService = productService;
-            _categoryService = categoryService;
+            _productService = productService ?? throw new ArgumentNullException(nameof(productService));
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         [Authorize(Policy = "Product")]

@@ -14,7 +14,7 @@ namespace SewingFactory.Controllers
 
         public CategoriesController(ICategoryService categoryService)
         {
-            _categoryService = categoryService;
+            _categoryService = categoryService ?? throw new ArgumentNullException(nameof(categoryService));
         }
 
         // GET: api/Categories
