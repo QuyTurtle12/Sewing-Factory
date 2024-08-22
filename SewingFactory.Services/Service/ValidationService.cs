@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using SewingFactory.Repositories.DBContext;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Models.DTOs;
 
 namespace SewingFactory.Services.Service
 {
@@ -14,7 +14,7 @@ namespace SewingFactory.Services.Service
         }
 
         // Validate the creation DTO
-        public void ValidateCreateUserDto(CreateDto request)
+        public void ValidateCreateUserDto(UserCreateDto request)
         {
             var context = new ValidationContext(request);
             var results = new List<ValidationResult>();
@@ -31,10 +31,19 @@ namespace SewingFactory.Services.Service
             {
                 throw new ValidationException($"Username '{request.Username}' is already taken.");
             }
+            if (!_dbContext.Roles.Any(r => r.ID == request.RoleID))
+            {
+                throw new ValidationException("Invalid role Id.");
+            }
+            if (!_dbContext.Groups.Any(g => g.ID == request.GroupID))
+            {
+                throw new ValidationException("Invalid group Id.");
+            }
+
         }
 
         // Validate the update DTO
-        public void ValidateUpdateUserDto(Guid id, UpdateDto request)
+        public void ValidateUpdateUserDto(Guid id, UserUpdateDto request)
         {
             var context = new ValidationContext(request);
             var results = new List<ValidationResult>();
@@ -50,6 +59,14 @@ namespace SewingFactory.Services.Service
             if (_dbContext.Users.Any(u => u.Username == request.Username && u.ID != id))
             {
                 throw new ValidationException($"Username '{request.Username}' is already taken.");
+            }
+            if (request.RoleID.HasValue && !_dbContext.Roles.Any(r => r.ID == request.RoleID))
+            {
+                throw new ValidationException("Invalid role Id.");
+            }
+            if (request.GroupID.HasValue && !_dbContext.Groups.Any(g => g.ID == request.GroupID))
+            {
+                throw new ValidationException("Invalid group Id.");
             }
         }
 

@@ -1,6 +1,6 @@
 namespace SewingFactory.Models.DTOs
 {
-    public class AddOrderDTO
+    public class OrderCreateDto
     {
         public Guid ProductID { get; set; }
         public int? Quantity { get; set; }

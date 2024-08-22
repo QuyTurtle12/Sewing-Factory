@@ -60,7 +60,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Product Manager",
             Description = "Update category"
         )]
-        public async Task<IActionResult> PutCategory(Guid id, CategoryDTO categoryDTO)
+        public async Task<IActionResult> PutCategory(Guid id, CategoryDto categoryDTO)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Product Manager",
             Description = "Create a new category"
         )]
-        public async Task<ActionResult<object>> PostCategory(CategoryDTO categoryDTO)
+        public async Task<ActionResult<object>> PostCategory(CategoryDto categoryDTO)
         {
             try
             {

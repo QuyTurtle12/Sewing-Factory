@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Service;
 
 namespace SewingFactory.Controllers
@@ -25,7 +25,7 @@ namespace SewingFactory.Controllers
         /// <param name="loginDto">The login data containing username and password.</param>
         /// <returns>ActionResult containing the JWT token or an error message.</returns>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
+        public async Task<IActionResult> Login([FromBody] UserLoginDto loginDto)
         {
             if (loginDto == null)
             {

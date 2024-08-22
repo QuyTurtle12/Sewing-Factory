@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SewingFactory.Services.DTOs.UserDto.RequestDto;
+using SewingFactory.Models.DTOs;
 using SewingFactory.Services.Service;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -30,7 +30,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Staff Manager",
             Description = "Create a new user"
         )]
-        public async Task<IActionResult> CreateUser([FromBody] CreateDto request)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDto request)
         {
             if (request == null)
             {
@@ -219,7 +219,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Staff Manager",
             Description = "Update a user"
         )]
-        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateDto request)
+        public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UserUpdateDto request)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Staff Manager",
             Description = "Enable/disable a user"
         )]
-        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UpdateUserStatusDto statusDto)
+        public async Task<IActionResult> UpdateStatus(Guid id, [FromBody] UserStatusUpdateDto statusDto)
         {
             if (id == Guid.Empty)
             {
@@ -302,7 +302,7 @@ namespace SewingFactory.Controllers
         [SwaggerOperation(
             Description = "change password"
         )]
-        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] ChangePasswordForStaffDto request)
+        public async Task<IActionResult> ChangePassword(Guid id, [FromBody] StaffPasswordUpdateDto request)
         {
             if (request == null)
             {

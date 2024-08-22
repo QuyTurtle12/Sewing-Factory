@@ -65,7 +65,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Anyone",
             Description = "Get product by ID."
         )]
-        public async Task<ActionResult<ProductDetailsDTO>> GetProduct(Guid id)
+        public async Task<ActionResult<ProductViewDto>> GetProduct(Guid id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace SewingFactory.Controllers
         )]
         // PUT: api/Products/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(Guid id, ProductDTO productDTO)
+        public async Task<IActionResult> PutProduct(Guid id, ProductDto productDTO)
         {
             try
             {
@@ -114,7 +114,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Product Manager",
             Description = "Create a new product."
         )]
-        public async Task<ActionResult<Product>> PostProduct(ProductDTO productDTO)
+        public async Task<ActionResult<Product>> PostProduct(ProductDto productDTO)
         {
             try
             {
@@ -163,7 +163,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Product Manager",
             Description = "Search products with filters and pagination."
         )]
-        public async Task<ActionResult<IEnumerable<ProductDetailsDTO>>> SearchProduct(
+        public async Task<ActionResult<IEnumerable<ProductViewDto>>> SearchProduct(
             int pageNumber = 1,
             int pageSize = 10,
             string searchByName = null,

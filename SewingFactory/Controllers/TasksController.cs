@@ -89,7 +89,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager that created that task",
             Description = "Adjust corresponding order, task name, task description and deadline of the task (deadline must be in [yyyy-MM-dd HH:mm:ss] format)"
         )]
-        public async Task<IActionResult> UpdateTaskInfo([Required] Guid id, TaskUpdateDto dto)
+        public async Task<IActionResult> UpdateTaskInfo([Required] Guid id, [Required] TaskUpdateDto dto)
         {
             try
             {
@@ -138,7 +138,7 @@ namespace SewingFactory.Controllers
             Summary = "Authorization: Order Manager",
             Description = "Create a new task for the order, providing OrderID, GroupID, task name and description"
         )]
-        public async Task<IActionResult> PostTask(TaskCreateDto dto)
+        public async Task<IActionResult> PostTask([Required] TaskCreateDto dto)
         {
             try
             {
